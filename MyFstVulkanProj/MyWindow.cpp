@@ -1,0 +1,26 @@
+#include "MyWindow.h"
+
+#define GLFW_INCLUDE_VULKAN
+#include <GLFW/glfw3.h>
+
+/**
+* Window creation related code, specific to glfw
+*/
+MyWindow::MyWindow(uint32_t win_width, uint32_t win_height) {
+	glfwInit();
+	m_height = win_height;
+	m_width = win_width;
+	glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
+	glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
+	m_window = glfwCreateWindow(m_width, m_height, "Vulkan", nullptr, nullptr);
+}
+
+void MyWindow::getRequiredExtensions(uint32_t& glfwExtensionCount, const char*** glfwExtensions) {
+	*glfwExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
+}
+
+MyWindow::~MyWindow()
+{
+	glfwDestroyWindow(m_window);
+	glfwTerminate();
+}
