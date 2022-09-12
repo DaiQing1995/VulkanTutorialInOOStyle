@@ -28,6 +28,9 @@
     <ClCompile Include="MyVKPhyDev.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="MyQueueFamily.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MyVKInstance.h">
@@ -37,6 +40,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="MyVKPhyDev.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MyQueueFamily.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

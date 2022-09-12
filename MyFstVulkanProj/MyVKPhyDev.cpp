@@ -15,14 +15,19 @@ MyVKPhyDev::~MyVKPhyDev() {
 	// after instance destroyed. No need to destroy it.
 }
 
-bool isDeviceSuitable(VkPhysicalDevice device) {
+/**
+* Check if the device is suitable
+*/
+bool MyVKPhyDev::isDeviceSuitable(VkPhysicalDevice device) {
 	VkPhysicalDeviceProperties deviceProperties;
 	vkGetPhysicalDeviceProperties(device, &deviceProperties);
 	VkPhysicalDeviceFeatures deviceFeatures;
 	vkGetPhysicalDeviceFeatures(device, &deviceFeatures);
 
+	indices = MyQueueFamily::findQueueFamilies(device);
+
 	return deviceProperties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU
-		&& deviceFeatures.geometryShader;
+		&& deviceFeatures.geometryShader && indices.isComplete();
 }
 
 void MyVKPhyDev::pickPhysicalDevice() {
