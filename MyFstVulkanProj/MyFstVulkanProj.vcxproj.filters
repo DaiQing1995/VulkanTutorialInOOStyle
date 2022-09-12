@@ -31,6 +31,9 @@
     <ClCompile Include="MyQueueFamily.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="MyLogicalDev.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MyVKInstance.h">
@@ -43,6 +46,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="MyQueueFamily.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MyLogicalDev.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -159,12 +159,14 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="MyLogicalDev.cpp" />
     <ClCompile Include="MyQueueFamily.cpp" />
     <ClCompile Include="MyVKInstance.cpp" />
     <ClCompile Include="MyVKPhyDev.cpp" />
     <ClCompile Include="MyWindow.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="MyLogicalDev.h" />
     <ClInclude Include="MyQueueFamily.h" />
     <ClInclude Include="MyVKInstance.h" />
     <ClInclude Include="MyVKPhyDev.h" />

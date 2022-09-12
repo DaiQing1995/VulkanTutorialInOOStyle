@@ -10,6 +10,7 @@ public:
 	~MyVKPhyDev();
 
 	inline VkPhysicalDevice getPhyDev() { return physicalDevice; }
+	inline uint32_t getQueueFamilyIdx() { return indices.graphicsFamily.value(); }
 
 private:
 	void pickPhysicalDevice();

@@ -3,6 +3,7 @@
 */
 #include "MyVKInstance.h"
 #include "MyVKPhyDev.h"
+#include "MyLogicalDev.h"
 #include <iostream>
 #include <vector>
 
@@ -38,6 +39,7 @@ private:
 		ins->setupDebugMessenger();
 
 		phyDev = new MyVKPhyDev(ins->getInstance());
+		logDev = new MyLogicalDev(phyDev->getPhyDev(), phyDev->getQueueFamilyIdx());
 	}
 
 	void mainLoop() {
@@ -47,6 +49,7 @@ private:
 	}
 
 	void cleanup() {
+		delete logDev;
 		delete phyDev;
 		delete ins;
 		delete window;
@@ -55,6 +58,7 @@ private:
 	MyWindow *window;
 	MyVKInstance *ins;
 	MyVKPhyDev* phyDev;
+	MyLogicalDev* logDev;
 };
 
 int main() {
