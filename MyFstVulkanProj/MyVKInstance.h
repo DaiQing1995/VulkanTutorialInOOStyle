@@ -14,6 +14,10 @@ public:
 
 	void setupDebugMessenger();
 
+	inline VkInstance getInstance() {
+		return instance;
+	}
+
 	MyVKInstance(MyWindow *window);
 	~MyVKInstance();
 

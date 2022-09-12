@@ -2,6 +2,7 @@
 * This file followed tutorial of vulkan with some diy modifications.
 */
 #include "MyVKInstance.h"
+#include "MyVKPhyDev.h"
 #include <iostream>
 #include <vector>
 
@@ -35,6 +36,8 @@ private:
 	void initVulkan() {
 		ins = new MyVKInstance(window);
 		ins->setupDebugMessenger();
+
+		phyDev = new MyVKPhyDev(ins->getInstance());
 	}
 
 	void mainLoop() {
@@ -44,12 +47,14 @@ private:
 	}
 
 	void cleanup() {
+		delete phyDev;
 		delete ins;
 		delete window;
 	}
 
 	MyWindow *window;
 	MyVKInstance *ins;
+	MyVKPhyDev* phyDev;
 };
 
 int main() {

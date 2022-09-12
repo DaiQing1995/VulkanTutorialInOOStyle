@@ -25,12 +25,18 @@
     <ClCompile Include="MyWindow.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="MyVKPhyDev.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MyVKInstance.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="MyWindow.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MyVKPhyDev.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
