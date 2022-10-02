@@ -19,7 +19,7 @@ public:
 		return instance;
 	}
 
-	void createSurface();
+	VkSurfaceKHR createSurface();
 
 	MyVKInstance(MyWindow* window);
 	~MyVKInstance();

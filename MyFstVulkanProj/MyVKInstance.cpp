@@ -69,7 +69,7 @@ MyVKInstance::MyVKInstance(MyWindow* window) {
 	}
 }
 
-void MyVKInstance::createSurface() {
+VkSurfaceKHR MyVKInstance::createSurface() {
 	VkWin32SurfaceCreateInfoKHR surfaceCreateInfo{};
 	surfaceCreateInfo.sType = VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR;
 	surfaceCreateInfo.hwnd = glfwGetWin32Window(window->getGLFWWindow());
@@ -78,6 +78,8 @@ void MyVKInstance::createSurface() {
 	if (vkCreateWin32SurfaceKHR(instance, &surfaceCreateInfo, nullptr, &surface) != VK_SUCCESS) {
 		throw std::runtime_error("Failed to create window surface");
 	}
+
+	return surface;
 }
 
 MyVKInstance::~MyVKInstance()

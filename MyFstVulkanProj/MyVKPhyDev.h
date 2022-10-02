@@ -7,15 +7,15 @@
 class MyVKPhyDev
 {
 public:
-	MyVKPhyDev(VkInstance ins);
+	MyVKPhyDev(VkInstance ins, VkSurfaceKHR surface);
 	~MyVKPhyDev();
 
 	inline VkPhysicalDevice getPhyDev() { return physicalDevice; }
 	inline uint32_t getQueueFamilyIdx() { return indices.graphicsFamily.value(); }
 
 private:
-	void pickPhysicalDevice();
-	bool isDeviceSuitable(VkPhysicalDevice device);
+	void pickPhysicalDevice(VkSurfaceKHR surface);
+	bool isDeviceSuitable(VkPhysicalDevice device, VkSurfaceKHR surface);
 
 	VkPhysicalDevice physicalDevice;
 	VkInstance instance;

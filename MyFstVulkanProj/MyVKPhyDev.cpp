@@ -4,10 +4,10 @@
 #include <vector>
 #include <map>
 
-MyVKPhyDev::MyVKPhyDev(VkInstance ins) {
+MyVKPhyDev::MyVKPhyDev(VkInstance ins, VkSurfaceKHR surface) {
 	instance = ins;
 	physicalDevice = VK_NULL_HANDLE;
-	pickPhysicalDevice();
+	pickPhysicalDevice(surface);
 }
 
 MyVKPhyDev::~MyVKPhyDev() {
@@ -18,19 +18,19 @@ MyVKPhyDev::~MyVKPhyDev() {
 /**
 * Check if the device is suitable
 */
-bool MyVKPhyDev::isDeviceSuitable(VkPhysicalDevice device) {
+bool MyVKPhyDev::isDeviceSuitable(VkPhysicalDevice device, VkSurfaceKHR surface) {
 	VkPhysicalDeviceProperties deviceProperties;
 	vkGetPhysicalDeviceProperties(device, &deviceProperties);
 	VkPhysicalDeviceFeatures deviceFeatures;
 	vkGetPhysicalDeviceFeatures(device, &deviceFeatures);
 
-	indices = MyQueueFamily::findQueueFamilies(device);
+	indices = MyQueueFamily::findQueueFamilies(device, surface);
 
 	return deviceProperties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU
 		&& deviceFeatures.geometryShader && indices.isComplete();
 }
 
-void MyVKPhyDev::pickPhysicalDevice() {
+void MyVKPhyDev::pickPhysicalDevice(VkSurfaceKHR surface) {
 	uint32_t deviceCount = 0;
 	vkEnumeratePhysicalDevices(instance, &deviceCount, nullptr);
 
@@ -40,7 +40,7 @@ void MyVKPhyDev::pickPhysicalDevice() {
 	std::vector<VkPhysicalDevice> devices(deviceCount);
 	vkEnumeratePhysicalDevices(instance, &deviceCount, devices.data());
 	for (const auto& device : devices) {
-		if (isDeviceSuitable(device)) {
+		if (isDeviceSuitable(device, surface)) {
 			physicalDevice = device;
 			break;
 		}
