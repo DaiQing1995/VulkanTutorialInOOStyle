@@ -1,8 +1,11 @@
 #ifndef MY_WINDOW_H
 #define MY_WINDOW_H
 
+#define VK_USE_PLATFORM_WIN32_KHR
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
+#define GLFW_EXPOSE_NATIVE_WIN32
+#include <GLFW/glfw3native.h>
 
 const uint32_t DEFAULT_WIN_WIDTH = 800;
 const uint32_t DEFAULT_WIN_HEIGHT = 600;
@@ -17,6 +20,10 @@ public:
 
 	inline void poll_events() {
 		glfwPollEvents();
+	}
+
+	inline GLFWwindow* getGLFWWindow() {
+		return m_window;
 	}
 
 	inline bool should_close() {

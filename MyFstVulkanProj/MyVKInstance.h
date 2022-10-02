@@ -19,7 +19,9 @@ public:
 		return instance;
 	}
 
-	MyVKInstance(MyWindow *window);
+	void createSurface();
+
+	MyVKInstance(MyWindow* window);
 	~MyVKInstance();
 
 private:
@@ -44,9 +46,11 @@ private:
 
 	std::vector<const char*> getRequiredExtensions(MyWindow* window);
 
+	MyWindow* window;
 	VkInstance instance;
 	std::set<std::string> extensions_set;
 	VkDebugUtilsMessengerEXT debugMessenger;
+	VkSurfaceKHR surface;
 };
 
 #endif

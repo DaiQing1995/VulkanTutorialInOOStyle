@@ -21,6 +21,7 @@ void MyVKInstance::setupDebugMessenger() {
 * Create Instance attaching with appInfo and layer support
 */
 MyVKInstance::MyVKInstance(MyWindow* window) {
+	this->window = window;
 	VkApplicationInfo appInfo{};
 	appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
 	appInfo.pApplicationName = APP_NAME;
@@ -68,11 +69,23 @@ MyVKInstance::MyVKInstance(MyWindow* window) {
 	}
 }
 
+void MyVKInstance::createSurface() {
+	VkWin32SurfaceCreateInfoKHR surfaceCreateInfo{};
+	surfaceCreateInfo.sType = VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR;
+	surfaceCreateInfo.hwnd = glfwGetWin32Window(window->getGLFWWindow());
+	surfaceCreateInfo.hinstance = GetModuleHandle(nullptr);
+
+	if (vkCreateWin32SurfaceKHR(instance, &surfaceCreateInfo, nullptr, &surface) != VK_SUCCESS) {
+		throw std::runtime_error("Failed to create window surface");
+	}
+}
+
 MyVKInstance::~MyVKInstance()
 {
 	if (enableValidationLayers) {
 		DestroyDebugUtilsMessengerEXT(instance, debugMessenger, nullptr);
 	}
+	vkDestroySurfaceKHR(instance, surface, nullptr);
 	vkDestroyInstance(instance, nullptr);
 }
 

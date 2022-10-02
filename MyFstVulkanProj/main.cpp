@@ -37,6 +37,7 @@ private:
 	void initVulkan() {
 		ins = new MyVKInstance(window);
 		ins->setupDebugMessenger();
+		ins->createSurface();
 
 		phyDev = new MyVKPhyDev(ins->getInstance());
 		logDev = new MyLogicalDev(phyDev->getPhyDev(), phyDev->getQueueFamilyIdx());
