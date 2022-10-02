@@ -1,4 +1,5 @@
 #ifndef MY_QUEUE_FAMILY_H
+#define MY_QUEUE_FAMILY_H
 
 #include <vulkan/vulkan.h>
 #include <optional>

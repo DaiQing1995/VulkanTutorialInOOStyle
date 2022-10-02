@@ -1,4 +1,5 @@
 #ifndef MY_VK_PHY_DEV_H
+#define MY_VK_PHY_DEV_H
 
 #include <vulkan/vulkan.h>
 #include "MyQueueFamily.h"

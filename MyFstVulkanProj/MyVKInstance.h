@@ -1,4 +1,5 @@
 #ifndef MY_VK_INSTANCE_H
+#define MY_VK_INSTANCE_H
 
 #include "MyWindow.h"
 #include <set>

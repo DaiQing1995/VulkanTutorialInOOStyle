@@ -1,4 +1,5 @@
 #ifndef MY_LOGICAL_DEV_H
+#define MY_LOGICAL_DEV_H
 
 #include "vulkan/vulkan.h"
 #include <vector>
