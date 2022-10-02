@@ -1,8 +1,11 @@
 #include "MyVKInstance.h"
+#include "MyConfig.h"
+
 #include <vulkan/vulkan.h>
 #include <vector>
 #include <stdexcept>
 #include <iostream>
+
 
 /**
 * Create Debug messenger and binding it to the instance we use.
@@ -34,9 +37,15 @@ MyVKInstance::MyVKInstance(MyWindow* window) {
 	vkEnumerateInstanceExtensionProperties(nullptr, &extensionCount, nullptr);
 	std::vector<VkExtensionProperties> extensions(extensionCount);
 	vkEnumerateInstanceExtensionProperties(nullptr, &extensionCount, extensions.data());
+
+#ifdef EXTENSION_SUPPORT_DEBUG
 	std::cout << "available extensions:\n";
 	for (const auto& ext : extensions) {
 		std::cout << '\t' << ext.extensionName << '\n';
+	}
+#endif // EXTENSION_SUPPORT_DEBUG
+
+	for (const auto& ext : extensions) {
 		extensions_set.insert(ext.extensionName);
 	}
 
@@ -147,7 +156,9 @@ void MyVKInstance::DestroyDebugUtilsMessengerEXT(VkInstance instance, VkDebugUti
 void MyVKInstance::check_ext(const char** exts, const int cnt) {
 	for (int i = 0; i < cnt; ++i) {
 		if (extensions_set.find(exts[i]) != extensions_set.end()) {
+#ifdef EXTENSION_SUPPORT_DEBUG
 			std::cout << exts[i] << " found." << std::endl;
+#endif // EXTENSION_SUPPORT_DEBUG
 		}
 		else {
 			std::cout << exts[i] << " not found in supported set." << std::endl;
@@ -190,7 +201,6 @@ std::vector<const char*> MyVKInstance::getRequiredExtensions(MyWindow* window) {
 	const char** glfwExtensions;
 
 	window->getRequiredExtensions(glfwExtensionCount, &glfwExtensions);
-	//glfwExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
 
 	std::vector<const char*> extensions(glfwExtensions, glfwExtensions + glfwExtensionCount);
 	if (enableValidationLayers) {

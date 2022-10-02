@@ -1,2 +1,3 @@
 #pragma once
-#define INIT_FAMILY_QUEUE_DEBUG
+//#define INIT_FAMILY_QUEUE_DEBUG
+#define EXTENSION_SUPPORT_DEBUG
