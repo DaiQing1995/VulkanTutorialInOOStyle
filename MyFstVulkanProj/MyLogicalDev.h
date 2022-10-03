@@ -10,13 +10,14 @@ extern const std::vector<const char*> validationLayers;
 class MyLogicalDev
 {
 public:
-	MyLogicalDev(VkPhysicalDevice phyDev, uint32_t queueFamIdx);
+	MyLogicalDev(VkPhysicalDevice phyDev, uint32_t graphicsQueueFamIdx, uint32_t presentQueueFamIdx);
 	~MyLogicalDev();
 
 private:
 	VkDevice device;
 	VkPhysicalDeviceFeatures deviceFeatures{};
 	VkQueue graphicsQueue;
+	VkQueue presentQueue;
 };
 
 #endif // !MY_LOGICAL_DEV_H

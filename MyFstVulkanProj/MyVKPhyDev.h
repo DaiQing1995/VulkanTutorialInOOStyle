@@ -11,7 +11,8 @@ public:
 	~MyVKPhyDev();
 
 	inline VkPhysicalDevice getPhyDev() { return physicalDevice; }
-	inline uint32_t getQueueFamilyIdx() { return indices.graphicsFamily.value(); }
+	inline uint32_t getGraphicsQueueFamilyIdx() { return indices.graphicsFamily.value(); }
+	inline uint32_t getPresentQueueFamilyIdx() { return indices.presentFamily.value(); }
 
 private:
 	void pickPhysicalDevice(VkSurfaceKHR surface);
