@@ -18,6 +18,12 @@ private:
 	VkExtent2D chooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities);
 
 	VkSwapchainKHR swapchain;
+	std::vector<VkImage> swapChainImages;	// Saving images in swapchain
+	std::vector<VkImageView> swapChainImageViews;
+
+	// Record swapchain image info
+	VkFormat swapChainImageFormat;
+	VkExtent2D swapChainExtent;
 
 	const MyWindow *window;
 	const VkDevice device;
