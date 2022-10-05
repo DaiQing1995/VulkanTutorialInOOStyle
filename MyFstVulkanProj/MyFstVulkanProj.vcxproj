@@ -161,13 +161,16 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MyLogicalDev.cpp" />
     <ClCompile Include="MyQueueFamily.cpp" />
+    <ClCompile Include="MySwapchain.cpp" />
     <ClCompile Include="MyVKInstance.cpp" />
     <ClCompile Include="MyVKPhyDev.cpp" />
     <ClCompile Include="MyWindow.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="BasicEntities.h" />
     <ClInclude Include="MyLogicalDev.h" />
     <ClInclude Include="MyQueueFamily.h" />
+    <ClInclude Include="MySwapchain.h" />
     <ClInclude Include="MyVKInstance.h" />
     <ClInclude Include="MyVKPhyDev.h" />
     <ClInclude Include="MyWindow.h" />

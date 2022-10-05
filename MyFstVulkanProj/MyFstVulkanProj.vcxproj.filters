@@ -34,6 +34,9 @@
     <ClCompile Include="MyLogicalDev.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="MySwapchain.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MyVKInstance.h">
@@ -52,6 +55,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="MyConfig.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MySwapchain.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BasicEntities.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

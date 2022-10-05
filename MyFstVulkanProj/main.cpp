@@ -4,6 +4,7 @@
 #include "MyVKInstance.h"
 #include "MyVKPhyDev.h"
 #include "MyLogicalDev.h"
+#include "MySwapchain.h"
 #include <iostream>
 #include <vector>
 
@@ -11,6 +12,10 @@ const char* APP_NAME = "Hello Triangle";
 
 const std::vector<const char*> validationLayers = {
 	"VK_LAYER_KHRONOS_validation"
+};
+
+const std::vector<const char*> deviceExtensions = {
+	VK_KHR_SWAPCHAIN_EXTENSION_NAME
 };
 
 #ifdef NDEBUG
@@ -39,8 +44,15 @@ private:
 		ins->setupDebugMessenger();
 		VkSurfaceKHR surface = ins->createSurface();
 
-		phyDev = new MyVKPhyDev(ins->getInstance(), surface);
-		logDev = new MyLogicalDev(phyDev->getPhyDev(), phyDev->getQueueFamilyIdx());
+		phyDev = new MyVKPhyDev(ins, surface);
+		logDev = new MyLogicalDev(phyDev->getPhyDev(),
+				phyDev->getGraphicsQueueFamilyIdx(),
+				phyDev->getPresentQueueFamilyIdx());
+		swapChain = new MySwapchain(window,
+				phyDev->getSwapChainSupportDetails(),
+				surface, logDev->getDevice(),
+				phyDev->getGraphicsQueueFamilyIdx(),
+				phyDev->getPresentQueueFamilyIdx());
 	}
 
 	void mainLoop() {
@@ -50,6 +62,7 @@ private:
 	}
 
 	void cleanup() {
+		delete swapChain;
 		delete logDev;
 		delete phyDev;
 		delete ins;
@@ -60,6 +73,7 @@ private:
 	MyVKInstance *ins;
 	MyVKPhyDev* phyDev;
 	MyLogicalDev* logDev;
+	MySwapchain* swapChain;
 };
 
 int main() {

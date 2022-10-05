@@ -15,7 +15,7 @@ MyWindow::MyWindow(uint32_t win_width, uint32_t win_height) {
 	m_window = glfwCreateWindow(m_width, m_height, "Vulkan", nullptr, nullptr);
 }
 
-void MyWindow::getRequiredExtensions(uint32_t& glfwExtensionCount, const char*** glfwExtensions) {
+void MyWindow::getRequiredExtensions(uint32_t& glfwExtensionCount, const char*** glfwExtensions) const {
 	*glfwExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
 }
 
@@ -23,4 +23,8 @@ MyWindow::~MyWindow()
 {
 	glfwDestroyWindow(m_window);
 	glfwTerminate();
+}
+
+void MyWindow::getFrameBufferSize(int* width, int* height) const {
+	glfwGetFramebufferSize(m_window, width, height);
 }

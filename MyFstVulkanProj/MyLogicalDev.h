@@ -6,12 +6,16 @@
 
 extern const bool enableValidationLayers;
 extern const std::vector<const char*> validationLayers;
+extern const std::vector<const char*> deviceExtensions;
 
 class MyLogicalDev
 {
 public:
-	MyLogicalDev(VkPhysicalDevice phyDev, uint32_t graphicsQueueFamIdx, uint32_t presentQueueFamIdx);
+	MyLogicalDev(VkPhysicalDevice phyDev, uint32_t graphicsQueueFamIdx,
+		uint32_t presentQueueFamIdx);
 	~MyLogicalDev();
+
+	inline VkDevice getDevice() { return device; }
 
 private:
 	VkDevice device;

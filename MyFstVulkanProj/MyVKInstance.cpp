@@ -23,7 +23,7 @@ void MyVKInstance::setupDebugMessenger() {
 /**
 * Create Instance attaching with appInfo and layer support
 */
-MyVKInstance::MyVKInstance(MyWindow* window) {
+MyVKInstance::MyVKInstance(const MyWindow* window) {
 	this->window = window;
 	VkApplicationInfo appInfo{};
 	appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
@@ -196,7 +196,7 @@ bool MyVKInstance::checkValidationLayerSupport() {
 * Get required extensions from the WSI
 * and debug extension as well.
 */
-std::vector<const char*> MyVKInstance::getRequiredExtensions(MyWindow* window) {
+std::vector<const char*> MyVKInstance::getRequiredExtensions(const MyWindow* window) {
 	uint32_t glfwExtensionCount = 0;
 	const char** glfwExtensions;
 

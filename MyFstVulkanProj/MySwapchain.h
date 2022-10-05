@@ -1,0 +1,26 @@
+#ifndef MY_SWAPCHAIN_H
+#define MY_SWAPCHAIN_H
+
+#include "BasicEntities.h"
+#include "MyWindow.h"
+
+class MySwapchain
+{
+public:
+	MySwapchain(const MyWindow* window, const SwapChainSupportDetails* swapchainSD,
+		VkSurfaceKHR surface, VkDevice device, uint32_t gfxIdx, uint32_t pstIdx);
+
+	~MySwapchain();
+
+private:
+	VkSurfaceFormatKHR chooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats);
+	VkPresentModeKHR chooseSwapPresentMode(const std::vector<VkPresentModeKHR>& availablePresentModes);
+	VkExtent2D chooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities);
+
+	VkSwapchainKHR swapchain;
+
+	const MyWindow *window;
+	const VkDevice device;
+};
+
+#endif // !MY_SWAPCHAIN_H

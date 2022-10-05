@@ -21,7 +21,7 @@ public:
 
 	VkSurfaceKHR createSurface();
 
-	MyVKInstance(MyWindow* window);
+	MyVKInstance(const MyWindow* window);
 	~MyVKInstance();
 
 private:
@@ -44,9 +44,10 @@ private:
 	void check_ext(const char** exts, const int cnt);
 	bool checkValidationLayerSupport();
 
-	std::vector<const char*> getRequiredExtensions(MyWindow* window);
+	// Required extensions for instance
+	std::vector<const char*> getRequiredExtensions(const MyWindow* window);
 
-	MyWindow* window;
+	const MyWindow* window;
 	VkInstance instance;
 	std::set<std::string> extensions_set;
 	VkDebugUtilsMessengerEXT debugMessenger;

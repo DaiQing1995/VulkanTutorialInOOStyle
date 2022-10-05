@@ -32,16 +32,20 @@ MyLogicalDev::MyLogicalDev(VkPhysicalDevice phyDev, uint32_t graphicsQueueFamIdx
 
 	VkDeviceCreateInfo createInfo{};
 	createInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
-	createInfo.queueCreateInfoCount = static_cast<uint32_t>(queueCreateInfos.size());
+	createInfo.queueCreateInfoCount = static_cast<uint32_t>
+			(queueCreateInfos.size());
 	createInfo.pQueueCreateInfos = queueCreateInfos.data();
 	createInfo.pEnabledFeatures = &deviceFeatures;
-	createInfo.enabledExtensionCount = 0;
+	createInfo.enabledExtensionCount = static_cast<uint32_t>
+			(deviceExtensions.size());
+	createInfo.ppEnabledExtensionNames = deviceExtensions.data();
 	/**
 	* Only for compatibility with old vulkan version, following works are needed,
 	* they have already been set in instance layer, and works for VkDevice.
 	*/
 	if (enableValidationLayers) {
-		createInfo.enabledLayerCount = static_cast<uint32_t>(validationLayers.size());
+		createInfo.enabledLayerCount = static_cast<uint32_t>
+				(validationLayers.size());
 		createInfo.ppEnabledLayerNames = validationLayers.data();
 	}
 	else {
@@ -63,5 +67,6 @@ MyLogicalDev::MyLogicalDev(VkPhysicalDevice phyDev, uint32_t graphicsQueueFamIdx
 MyLogicalDev::~MyLogicalDev()
 {
 	vkDestroyDevice(device, nullptr);
-	// For VkQueue which will be implicitly cleaned up when the device is destroyed.
+	// No need to destroy VkQueue explicitly, which will be implicitly
+	// cleaned up when the device is destroyed.
 }

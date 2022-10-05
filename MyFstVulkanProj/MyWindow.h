@@ -22,7 +22,7 @@ public:
 		glfwPollEvents();
 	}
 
-	inline GLFWwindow* getGLFWWindow() {
+	inline GLFWwindow* getGLFWWindow() const {
 		return m_window;
 	}
 
@@ -30,7 +30,8 @@ public:
 		return glfwWindowShouldClose(m_window);
 	}
 	
-	void getRequiredExtensions(uint32_t& glfwExtensionCount, const char*** glfwExtensions);
+	void getRequiredExtensions(uint32_t& glfwExtensionCount, const char*** glfwExtensions) const;
+	void getFrameBufferSize(int* width, int* height) const;
 
 private:
 	uint32_t m_height;
