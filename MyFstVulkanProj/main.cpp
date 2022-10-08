@@ -5,6 +5,8 @@
 #include "MyVKPhyDev.h"
 #include "MyLogicalDev.h"
 #include "MySwapchain.h"
+#include "MyGraphicsPipeline.h"
+
 #include <iostream>
 #include <vector>
 
@@ -40,19 +42,33 @@ private:
 	}
 
 	void initVulkan() {
+		// Init Instance
 		ins = new MyVKInstance(window);
 		ins->setupDebugMessenger();
+
+		// Create surface
 		VkSurfaceKHR surface = ins->createSurface();
 
+		// create phycical device
 		phyDev = new MyVKPhyDev(ins, surface);
+
+		// create logical device
 		logDev = new MyLogicalDev(phyDev->getPhyDev(),
 				phyDev->getGraphicsQueueFamilyIdx(),
 				phyDev->getPresentQueueFamilyIdx());
+
+		// create swapchain
 		swapChain = new MySwapchain(window,
 				phyDev->getSwapChainSupportDetails(),
 				surface, logDev->getDevice(),
 				phyDev->getGraphicsQueueFamilyIdx(),
 				phyDev->getPresentQueueFamilyIdx());
+
+		// create Graphics Line
+		gfxPipeline = new MyGraphicsPipeline(
+				logDev->getDevice(),
+				swapChain->getSwapChainExtent(),
+				swapChain->getSwapChainImageFmt());
 	}
 
 	void mainLoop() {
@@ -62,6 +78,7 @@ private:
 	}
 
 	void cleanup() {
+		delete gfxPipeline;
 		delete swapChain;
 		delete logDev;
 		delete phyDev;
@@ -74,6 +91,7 @@ private:
 	MyVKPhyDev* phyDev;
 	MyLogicalDev* logDev;
 	MySwapchain* swapChain;
+	MyGraphicsPipeline* gfxPipeline;
 };
 
 int main() {

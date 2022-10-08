@@ -37,6 +37,9 @@
     <ClCompile Include="MySwapchain.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="MyGraphicsPipeline.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MyVKInstance.h">
@@ -63,5 +66,19 @@
     <ClInclude Include="BasicEntities.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="MyGraphicsPipeline.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ShaderHelper.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="shaders\shader.vert">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="shaders\shader.frag">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
 </Project>

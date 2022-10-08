@@ -12,6 +12,9 @@ public:
 
 	~MySwapchain();
 
+	inline VkFormat getSwapChainImageFmt() { return swapChainImageFormat; }
+	inline VkExtent2D getSwapChainExtent() { return swapChainExtent; }
+
 private:
 	VkSurfaceFormatKHR chooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats);
 	VkPresentModeKHR chooseSwapPresentMode(const std::vector<VkPresentModeKHR>& availablePresentModes);

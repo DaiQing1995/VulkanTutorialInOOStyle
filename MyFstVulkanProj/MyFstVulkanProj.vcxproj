@@ -158,6 +158,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="MyGraphicsPipeline.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MyLogicalDev.cpp" />
     <ClCompile Include="MyQueueFamily.cpp" />
@@ -168,6 +169,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BasicEntities.h" />
+    <ClInclude Include="MyGraphicsPipeline.h" />
     <ClInclude Include="MyLogicalDev.h" />
     <ClInclude Include="MyQueueFamily.h" />
     <ClInclude Include="MySwapchain.h" />
@@ -175,6 +177,11 @@
     <ClInclude Include="MyVKPhyDev.h" />
     <ClInclude Include="MyWindow.h" />
     <ClInclude Include="MyConfig.h" />
+    <ClInclude Include="ShaderHelper.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="shaders\shader.frag" />
+    <None Include="shaders\shader.vert" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
