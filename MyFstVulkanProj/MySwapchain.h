@@ -3,10 +3,14 @@
 
 #include "BasicEntities.h"
 #include "MyWindow.h"
+#include "MyGraphicsPipeline.h"
 
 class MySwapchain
 {
 public:
+	// Framebuffer needs swapchain images info for creation.
+	friend class MyFramebuffer;
+
 	MySwapchain(const MyWindow* window, const SwapChainSupportDetails* swapchainSD,
 		VkSurfaceKHR surface, VkDevice device, uint32_t gfxIdx, uint32_t pstIdx);
 

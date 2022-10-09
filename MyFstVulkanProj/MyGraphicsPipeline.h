@@ -7,6 +7,7 @@
 class MyGraphicsPipeline
 {
 public:
+	friend class MyFramebuffer;
 	MyGraphicsPipeline(VkDevice device, VkExtent2D swapChainExtent, VkFormat swapChainImageFormat);
 	~MyGraphicsPipeline();
 

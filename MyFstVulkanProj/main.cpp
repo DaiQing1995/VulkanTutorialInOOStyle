@@ -6,6 +6,7 @@
 #include "MyLogicalDev.h"
 #include "MySwapchain.h"
 #include "MyGraphicsPipeline.h"
+#include "MyFramebuffer.h"
 
 #include <iostream>
 #include <vector>
@@ -69,6 +70,8 @@ private:
 				logDev->getDevice(),
 				swapChain->getSwapChainExtent(),
 				swapChain->getSwapChainImageFmt());
+
+		framebuffers = new MyFramebuffer(swapChain, gfxPipeline);
 	}
 
 	void mainLoop() {
@@ -78,6 +81,7 @@ private:
 	}
 
 	void cleanup() {
+		delete framebuffers;
 		delete gfxPipeline;
 		delete swapChain;
 		delete logDev;
@@ -92,6 +96,7 @@ private:
 	MyLogicalDev* logDev;
 	MySwapchain* swapChain;
 	MyGraphicsPipeline* gfxPipeline;
+	MyFramebuffer* framebuffers;
 };
 
 int main() {
