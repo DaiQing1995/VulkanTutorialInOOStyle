@@ -158,6 +158,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="MyCommandBuffer.cpp" />
     <ClCompile Include="MyFramebuffer.cpp" />
     <ClCompile Include="MyGraphicsPipeline.cpp" />
     <ClCompile Include="main.cpp" />
@@ -170,6 +171,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BasicEntities.h" />
+    <ClInclude Include="MyCommandBuffer.h" />
     <ClInclude Include="MyFramebuffer.h" />
     <ClInclude Include="MyGraphicsPipeline.h" />
     <ClInclude Include="MyLogicalDev.h" />

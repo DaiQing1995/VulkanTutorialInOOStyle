@@ -7,9 +7,9 @@
 #include "MySwapchain.h"
 #include "MyGraphicsPipeline.h"
 #include "MyFramebuffer.h"
+#include "MyCommandBuffer.h"
 
 #include <iostream>
-#include <vector>
 
 const char* APP_NAME = "Hello Triangle";
 
@@ -72,6 +72,10 @@ private:
 				swapChain->getSwapChainImageFmt());
 
 		framebuffers = new MyFramebuffer(swapChain, gfxPipeline);
+
+		cmdbuffer = new MyCommandBuffer(logDev->getDevice(),
+				phyDev->getGraphicsQueueFamilyIdx(),
+				phyDev->getPresentQueueFamilyIdx());
 	}
 
 	void mainLoop() {
@@ -81,6 +85,7 @@ private:
 	}
 
 	void cleanup() {
+		delete cmdbuffer;
 		delete framebuffers;
 		delete gfxPipeline;
 		delete swapChain;
@@ -97,6 +102,7 @@ private:
 	MySwapchain* swapChain;
 	MyGraphicsPipeline* gfxPipeline;
 	MyFramebuffer* framebuffers;
+	MyCommandBuffer* cmdbuffer;
 };
 
 int main() {
