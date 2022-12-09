@@ -10,7 +10,8 @@ public:
 	friend class MyFramebuffer;
 	MyGraphicsPipeline(VkDevice device, VkExtent2D swapChainExtent, VkFormat swapChainImageFormat);
 	~MyGraphicsPipeline();
-
+	inline VkPipeline getPipeline() { return graphicsPipeline; }
+	inline VkRenderPass getRenderPass() { return renderPass; }
 private:
 	VkShaderModule createShaderModule(VkDevice device, const std::vector<char>& code);
 	void setupRenderPass(VkFormat swapChainImageFormat);

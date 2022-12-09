@@ -16,6 +16,8 @@ public:
 	~MyLogicalDev();
 
 	inline VkDevice getDevice() { return device; }
+	inline VkQueue getGFXQueue() { return graphicsQueue; }
+	inline VkQueue getPresentQueue() { return graphicsQueue; }
 
 private:
 	VkDevice device;

@@ -3,8 +3,12 @@
 #include <stdexcept>
 
 /**
-* Specify how many color and depth buffers are needed. How many samples used
-* for them.
+* Specify how many color and depth buffers are needed. 
+* How many samples used for them.
+* How the image Layout relationships are
+* 
+* PS: One Render Pass seems could have multi-pipelines to which render
+* pass binds.
 */
 void MyGraphicsPipeline::setupRenderPass(VkFormat swapChainImageFormat) {
 	VkAttachmentDescription colorAttachment{};
@@ -42,6 +46,19 @@ void MyGraphicsPipeline::setupRenderPass(VkFormat swapChainImageFormat) {
 	*	- DepthStencilAttachment: for depth and stencil data
 	*	- PreserveAttachment: not used for subpass but for preserved data
 	*/
+	VkSubpassDependency dependency{};
+	dependency.srcSubpass = VK_SUBPASS_EXTERNAL;
+	dependency.dstSubpass = 0;	// the index, the only subpass in this render pass.
+
+	dependency.srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+	// NOTE: Inside color attachment output stage, swapchain may still reading for present,
+	// this dependency makes sure reading finished, and start new rendering.
+	dependency.srcAccessMask = 0;
+	// we don't need care the original access state but the target state
+
+	dependency.dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+	// until writable color output stage, reading could finish.
+	dependency.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
 
 	VkRenderPassCreateInfo renderPassInfo{};
 	renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
@@ -49,6 +66,8 @@ void MyGraphicsPipeline::setupRenderPass(VkFormat swapChainImageFormat) {
 	renderPassInfo.pAttachments = &colorAttachment;
 	renderPassInfo.subpassCount = 1;
 	renderPassInfo.pSubpasses = &subpass;
+	renderPassInfo.dependencyCount = 1;
+	renderPassInfo.pDependencies = &dependency;
 
 	if (vkCreateRenderPass(device, &renderPassInfo, nullptr, &renderPass) != VK_SUCCESS) {
 		throw std::runtime_error("failed to create render pass!");

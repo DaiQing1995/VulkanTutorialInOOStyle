@@ -96,7 +96,7 @@ void MyCommandBuffer::startRenderPass(VkRenderPass renderPass, VkFramebuffer fra
 	vkCmdBeginRenderPass(commandBuffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
 }
 
-void MyCommandBuffer::bindPipeline(VkPipeline gfxPipeline, VkExtent2D swapChainExtent) {
+void MyCommandBuffer::bindGFXPipeline(VkPipeline gfxPipeline, VkExtent2D swapChainExtent) {
 	vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, gfxPipeline);
 	
 	// TODO: Pipeline dynamic settings, which is strong relates to pipeline sets, make

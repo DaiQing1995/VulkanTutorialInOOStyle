@@ -12,6 +12,8 @@ public:
 	MyFramebuffer(MySwapchain *swapchain, MyGraphicsPipeline *pipeline);
 	~MyFramebuffer();
 
+	inline VkFramebuffer getFramebuffer(uint32_t index) { return swapChainFramebuffers[index]; }
+
 private:
 	std::vector<VkFramebuffer> swapChainFramebuffers;
 	MySwapchain* swapChain;
