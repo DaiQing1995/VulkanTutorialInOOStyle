@@ -57,8 +57,8 @@ MyLogicalDev::MyLogicalDev(VkPhysicalDevice phyDev, uint32_t graphicsQueueFamIdx
 	}
 
 	/**
-	* The 3rd param indicates the queue index we want, since we only specify
-	* 1 queue, so use 0 to get the first queue.
+	* The 3rd param indicates the queue index we want from queue family, since we
+	* only need 1 queue, so use 0 to get the first queue.
 	*/
 	vkGetDeviceQueue(device, graphicsQueueFamIdx, 0, &graphicsQueue);
 	vkGetDeviceQueue(device, presentQueueFamIdx, 0, &presentQueue);

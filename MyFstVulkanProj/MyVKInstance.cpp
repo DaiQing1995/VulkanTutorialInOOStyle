@@ -12,6 +12,7 @@
 */
 void MyVKInstance::setupDebugMessenger() {
 	if (!enableValidationLayers) return;
+
 	VkDebugUtilsMessengerCreateInfoEXT createInfo;
 	this->populateDebugMessengerCreateInfo(createInfo);
 	if (CreateDebugUtilsMessengerEXT(instance, &createInfo, nullptr,
@@ -21,7 +22,7 @@ void MyVKInstance::setupDebugMessenger() {
 }
 
 /**
-* Create Instance attaching with appInfo and layer support
+* Create Instance attached with appInfo and layer support
 */
 MyVKInstance::MyVKInstance(const MyWindow* window) {
 	this->window = window;
@@ -58,7 +59,7 @@ MyVKInstance::MyVKInstance(const MyWindow* window) {
 	createInfo.enabledExtensionCount = req_extensions.size();
 	createInfo.ppEnabledExtensionNames = req_extensions.data();
 
-	// this structure can not be put inside if block, else it dies before instance create.
+	// Note: do not put this structure inside "if", or it may freed before instance creation.
 	VkDebugUtilsMessengerCreateInfoEXT debugCreateInfo{};
 	if (enableValidationLayers) {
 		if (!checkValidationLayerSupport())
@@ -78,6 +79,10 @@ MyVKInstance::MyVKInstance(const MyWindow* window) {
 	}
 }
 
+/**
+* Window Surface is platform-specific, here it runs on Windows. Need to create a
+* WIN32 Surface for the frame buffer to attach on.
+*/
 VkSurfaceKHR MyVKInstance::createSurface() {
 	VkWin32SurfaceCreateInfoKHR surfaceCreateInfo{};
 	surfaceCreateInfo.sType = VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR;
@@ -120,7 +125,6 @@ void MyVKInstance::populateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateI
 	createInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
 	createInfo.messageSeverity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT |
 		VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT |
-		VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT |
 		VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT;
 	createInfo.messageType = VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT |
 		VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT |
@@ -130,12 +134,14 @@ void MyVKInstance::populateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateI
 
 /**
 * Wrapper for vkCreateDebugUtilsMessengerEXT
+* It would create a debug messenger represents the debugger, binding between instance and
+* messenger is aotomatically done during creation.
 */
 VkResult MyVKInstance::CreateDebugUtilsMessengerEXT(VkInstance instance, const VkDebugUtilsMessengerCreateInfoEXT* pCreateInfo,
 	const VkAllocationCallbacks* pAllocator, VkDebugUtilsMessengerEXT* pDebugMessenger) {
-	auto func = (PFN_vkCreateDebugUtilsMessengerEXT)vkGetInstanceProcAddr(instance, "vkCreateDebugUtilsMessengerEXT");
-	if (func != nullptr) {
-		return func(instance, pCreateInfo, pAllocator, pDebugMessenger);
+	auto pfnCreateDebugUtilsMessgener = (PFN_vkCreateDebugUtilsMessengerEXT)vkGetInstanceProcAddr(instance, "vkCreateDebugUtilsMessengerEXT");
+	if (pfnCreateDebugUtilsMessgener != nullptr) {
+		return pfnCreateDebugUtilsMessgener(instance, pCreateInfo, pAllocator, pDebugMessenger);
 	}
 	else {
 		return VK_ERROR_EXTENSION_NOT_PRESENT;

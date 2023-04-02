@@ -1,8 +1,14 @@
 #include "MyFramebuffer.h"
 #include <stdexcept>
 
+/**
+* Framebuffer just represents the color attachment. can not be regarded as a buffer and being used
+* for mapping, drawing, etc.
+* The drawing operation would happen direcly on VkImage. FB is just a simbol.
+*/
 MyFramebuffer::MyFramebuffer(MySwapchain *swapchain, MyGraphicsPipeline* pipeline)
 	:swapChain(swapchain), device(swapchain->device){
+
 	swapChainFramebuffers.resize(swapChain->swapChainImageViews.size());
 	for (size_t i = 0; i < swapchain->swapChainImageViews.size(); ++i) {
 		VkImageView attachments[] = {

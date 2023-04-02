@@ -38,10 +38,12 @@ public:
 
 private:
 
+	// Create Window for Win System
 	void initWindow() {
 		window = new MyWindow();
 	}
 
+	// Vulkan environment settings
 	void initVulkan() {
 		// Init Instance
 		ins = new MyVKInstance(window);
@@ -50,36 +52,40 @@ private:
 		// Create surface
 		VkSurfaceKHR surface = ins->createSurface();
 
-		// create phycical device
+		// Create phycical device
 		phyDev = new MyVKPhyDev(ins, surface);
 
-		// create logical device
+		// Create logical device
 		logDev = new MyLogicalDev(phyDev->getPhyDev(),
 				phyDev->getGraphicsQueueFamilyIdx(),
 				phyDev->getPresentQueueFamilyIdx());
 
-		// create swapchain
+		// Create swapchain
 		swapChain = new MySwapchain(window,
 				phyDev->getSwapChainSupportDetails(),
 				surface, logDev->getDevice(),
 				phyDev->getGraphicsQueueFamilyIdx(),
 				phyDev->getPresentQueueFamilyIdx());
 
-		// create Graphics Line
+		// Create Graphics Line
 		gfxPipeline = new MyGraphicsPipeline(
 				logDev->getDevice(),
 				swapChain->getSwapChainExtent(),
 				swapChain->getSwapChainImageFmt());
 
+		// Create framebuffer
 		framebuffers = new MyFramebuffer(swapChain, gfxPipeline);
 
+		// Create Command buffer
 		cmdbuffer = new MyCommandBuffer(logDev->getDevice(),
 				phyDev->getGraphicsQueueFamilyIdx(),
 				phyDev->getPresentQueueFamilyIdx());
 
+		// Create objects for sync
 		createSyncObjects();
 	}
 
+	// Drawing
 	void mainLoop() {
 		while (!window->should_close()) {
 			window->poll_events();
@@ -112,14 +118,15 @@ private:
 	* 5. present the swap chain image
 	*/
 	void drawFrame() {
-		// 1. wait
+		// 1. wait 1 signal for inFlightFence
 		vkWaitForFences(logDev->getDevice(), 1, &inFlightFence, VK_TRUE, UINT64_MAX);
+		// recor the signal
 		vkResetFences(logDev->getDevice(), 1, &inFlightFence);
+
 		uint32_t imageIndex;
-		// 2. acquire
+		// 2. acquire image index
 		// after acquire, imageAvailable Semaphore signaled(Inside GPU, CPU continues), 
-		// indicates drawing starts 
-		// imageIndex is the framebuffer index inside swapchain framebuffers vector
+		// imageIndex is the VkImage index inside swapchain's swapChainImages vector
 		vkAcquireNextImageKHR(logDev->getDevice(), swapChain->getSwapChain(), UINT64_MAX,
 			imageAvailableSemaphore, VK_NULL_HANDLE, &imageIndex);
 
@@ -144,14 +151,17 @@ private:
 		submitInfo.waitSemaphoreCount = 1;
 		submitInfo.pWaitSemaphores = waitSemaphores;
 		submitInfo.pWaitDstStageMask = waitStages;	// just theoretically assume pipeline
-													// could not finished, add this barrier
+													// could not finished since it is signaled
+													// during vkAcquireNextImageKHR
 		submitInfo.commandBufferCount = 1;
 		submitInfo.pCommandBuffers = cmdbuffer->getCmdBufferPtr();
-		
-		VkSemaphore signalSemaphores[] = { renderFinishedSemaphore };
-		submitInfo.signalSemaphoreCount = 1;
-		submitInfo.pSignalSemaphores = signalSemaphores;
 
+		// let it signal renderFinish semaphore after executed
+		VkSemaphore renderFinsied[] = { renderFinishedSemaphore };
+		submitInfo.signalSemaphoreCount = 1;
+		submitInfo.pSignalSemaphores = renderFinsied;
+
+		// Signal inFlightFence after execution, then CPU can reuse the command buffer.
 		if (vkQueueSubmit(logDev->getGFXQueue(), 1, &submitInfo, inFlightFence) != VK_SUCCESS) {
 			throw std::runtime_error("failed to submit draw command buffer!");
 		}
@@ -161,7 +171,8 @@ private:
 		presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
 
 		presentInfo.waitSemaphoreCount = 1;
-		presentInfo.pWaitSemaphores = signalSemaphores;
+		// presents must wait finished
+		presentInfo.pWaitSemaphores = renderFinsied;
 
 		VkSwapchainKHR swapchains[] = { swapChain->getSwapChain() };
 		presentInfo.swapchainCount = 1;
@@ -171,9 +182,19 @@ private:
 		vkQueuePresentKHR(logDev->getPresentQueue(), &presentInfo);
 	}
 
+	/**
+	* Create 2 semaphores:
+	*	- imageAvailable: represents display finished, and the image can be reused
+	*   - renderFinished: represents GPU finished job, time for display.
+	* Create 1 Fence:
+	*	- Command submit and get execute, Let CPU wait GPU.
+	*/
 	void createSyncObjects() {
+		// GPU inside
 		VkSemaphoreCreateInfo semaphoreInfo{};
 		semaphoreInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
+
+		// CPU wait GPU
 		VkFenceCreateInfo fenceInfo{};
 		fenceInfo.flags = VK_FENCE_CREATE_SIGNALED_BIT;	// create fence with signaled state.
 		fenceInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;

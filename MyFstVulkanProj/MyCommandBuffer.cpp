@@ -28,7 +28,6 @@ MyCommandBuffer::MyCommandBuffer(VkDevice device,
 		throw std::runtime_error("failed to create command pool!");
 	}
 
-	// TODO: Create Command Buffer
 	VkCommandBufferAllocateInfo allocInfo{};
 	allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
 	allocInfo.commandPool = commandPool;
@@ -73,7 +72,12 @@ void MyCommandBuffer::recordCommandBuffer() {
 	}
 }
 
+/**
+* Specify the render pass used during this command buffer submit.
+* And and the VkFramebuffer for swapchain image description.
+*/
 void MyCommandBuffer::startRenderPass(VkRenderPass renderPass, VkFramebuffer framebuffer, VkExtent2D swapChainExtent) {
+
 	VkRenderPassBeginInfo renderPassInfo{};
 	renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
 	renderPassInfo.renderPass = renderPass;
@@ -96,9 +100,11 @@ void MyCommandBuffer::startRenderPass(VkRenderPass renderPass, VkFramebuffer fra
 	vkCmdBeginRenderPass(commandBuffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
 }
 
-void MyCommandBuffer::bindGFXPipeline(VkPipeline gfxPipeline, VkExtent2D swapChainExtent) {
+void MyCommandBuffer::bindGFXPipeline(VkPipeline gfxPipeline,
+		VkExtent2D swapChainExtent) {
+
 	vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, gfxPipeline);
-	
+
 	// TODO: Pipeline dynamic settings, which is strong relates to pipeline sets, make
 	// it flexible in the future.
 	VkViewport viewport{};
@@ -118,12 +124,14 @@ void MyCommandBuffer::bindGFXPipeline(VkPipeline gfxPipeline, VkExtent2D swapCha
 
 void MyCommandBuffer::draw() {
 	// vertexCount, instanceCount, firstVertex, firstInstance
+	// vertex now is statically set in shader.
 	vkCmdDraw(commandBuffer, 3, 1, 0, 0);
 }
 
 void MyCommandBuffer::endRenderPass(VkRenderPass renderPass) {
 	// End render pass
 	vkCmdEndRenderPass(commandBuffer);
+
 	// Finish recording
 	if (vkEndCommandBuffer(commandBuffer) != VK_SUCCESS) {
 		throw std::runtime_error("failed to record command buffer!");

@@ -29,6 +29,8 @@ QueueFamilyIndices MyQueueFamily::findQueueFamilies(VkPhysicalDevice device, VkS
             graphicsFound = true;
         }
         VkBool32 presentSupport = false;
+        // Note: Surface is created as platform specific. GPU drivers may not
+        // implement the the corresponding platform support, need to check.
         vkGetPhysicalDeviceSurfaceSupportKHR(device, i, surface, &presentSupport);
         if (!presentFound && presentSupport) {
             indices.presentFamily = i;
@@ -36,9 +38,9 @@ QueueFamilyIndices MyQueueFamily::findQueueFamilies(VkPhysicalDevice device, VkS
         }
         if (graphicsFound && presentFound) {
 #ifdef INIT_FAMILY_QUEUE_DEBUG
-            std::cout << "[Queue] Graphics queue family: "
+            std::cout << "[Queue] Graphics queue family supports this platform surface: "
                 << indices.graphicsFamily.value() << std::endl;
-            std::cout << "[Queue] Present queue family: "
+            std::cout << "[Queue] Present queue family supports this platform surface: "
                 << indices.presentFamily.value() << std::endl;
 #endif
             break;

@@ -21,7 +21,7 @@ MyVKPhyDev::~MyVKPhyDev() {
 	// after instance destroyed. No need to destroy it.
 }
 
-bool MyVKPhyDev::checkDeviceExtensionSupport(VkPhysicalDevice device) {
+bool MyVKPhyDev::checkDeviceExtensionAndSwapchainSupport(VkPhysicalDevice device) {
 	uint32_t extensionCount;
 	vkEnumerateDeviceExtensionProperties(device, nullptr, &extensionCount, nullptr);
 
@@ -55,7 +55,7 @@ bool MyVKPhyDev::checkDeviceExtensionSupport(VkPhysicalDevice device) {
 	if (extensionSupported) {
 		// Check Swapchain support is OK,there is at least one format can
 		// be used for swapchain image, and at least on mode for diaplay.
-		SwapChainSupportDetails swapChainSupport = querySwapChainSupport(device);
+		SwapChainSupportDetails swapChainSupport = querySwapChainSupport(device, surface);
 		swapChainAdequate = !swapChainSupport.formats.empty() &&
 				!swapChainSupport.presentModes.empty();
 	}
@@ -63,30 +63,41 @@ bool MyVKPhyDev::checkDeviceExtensionSupport(VkPhysicalDevice device) {
 	return swapChainAdequate;
 }
 
-SwapChainSupportDetails MyVKPhyDev::querySwapChainSupport(VkPhysicalDevice device) {
+/**
+* For the current platform surface, need to acquire support on it, like
+* formats it supported and present mode.
+*
+* Present mode would indicate how swapchain in driver handles the display buffer:
+* - IMMEDIATE: directly display, do not wait vertical blank signal. Tearing may happen!
+* - MAILBOX: wait vblank to serve but keep drawing. Use a single-entry queue to serve the image.
+* Old image for vblack signal would be discarded if not being digested by vblank.
+* - FIFO: serve like mailbox but just wait, do not keep drawing.
+*/
+SwapChainSupportDetails MyVKPhyDev::querySwapChainSupport(
+		VkPhysicalDevice device, VkSurfaceKHR platformSurface) {
 
 	// Get capabilities, need use Physical Device and Surface
 	// which are the 2 core components of the swapchain.
-	vkGetPhysicalDeviceSurfaceCapabilitiesKHR(device, surface,
+	vkGetPhysicalDeviceSurfaceCapabilitiesKHR(device, platformSurface,
 		&swapChainSupportDetails.capabilities);
 
 	uint32_t formatCount;
 	vkGetPhysicalDeviceSurfaceFormatsKHR(device,
-		surface, &formatCount, nullptr);
+		platformSurface, &formatCount, nullptr);
 
 	if (formatCount != 0) {
 		swapChainSupportDetails.formats.resize(formatCount);
-		vkGetPhysicalDeviceSurfaceFormatsKHR(device, surface,
+		vkGetPhysicalDeviceSurfaceFormatsKHR(device, platformSurface,
 			&formatCount, swapChainSupportDetails.formats.data());
 	}
 
 	uint32_t presentModeCount;
-	vkGetPhysicalDeviceSurfacePresentModesKHR(device, surface,
+	vkGetPhysicalDeviceSurfacePresentModesKHR(device, platformSurface,
 		&presentModeCount, nullptr);
 
 	if (presentModeCount != 0) {
 		swapChainSupportDetails.presentModes.resize(presentModeCount);
-		vkGetPhysicalDeviceSurfacePresentModesKHR(device, surface,
+		vkGetPhysicalDeviceSurfacePresentModesKHR(device, platformSurface,
 			&presentModeCount, swapChainSupportDetails.presentModes.data());
 	}
 
@@ -104,13 +115,16 @@ bool MyVKPhyDev::isDeviceSuitable(VkPhysicalDevice device, VkSurfaceKHR surface)
 
 	indices = MyQueueFamily::findQueueFamilies(device, surface);
 
-	return  checkDeviceExtensionSupport(device)
+	return  checkDeviceExtensionAndSwapchainSupport(device)
 		// Mark : following judge is direct but not elegent,
 		// now everything is explicit, folling line is of no use.
 		// deviceProperties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU
 		&& deviceFeatures.geometryShader && indices.isComplete();
 }
 
+/**
+* Enumerate devices and pick a proper one like a dedicated GPU.
+*/
 void MyVKPhyDev::pickPhysicalDevice(VkSurfaceKHR surface) {
 	uint32_t deviceCount = 0;
 	vkEnumeratePhysicalDevices(instance->getInstance(), &deviceCount, nullptr);

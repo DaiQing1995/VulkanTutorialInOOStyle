@@ -46,9 +46,11 @@ void MyGraphicsPipeline::setupRenderPass(VkFormat swapChainImageFormat) {
 	*	- DepthStencilAttachment: for depth and stencil data
 	*	- PreserveAttachment: not used for subpass but for preserved data
 	*/
+
+	// wait src 
 	VkSubpassDependency dependency{};
 	dependency.srcSubpass = VK_SUBPASS_EXTERNAL;
-	dependency.dstSubpass = 0;	// the index, the only subpass in this render pass.
+	dependency.dstSubpass = 0;	// the index for the only subpass in this render pass.
 
 	dependency.srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
 	// NOTE: Inside color attachment output stage, swapchain may still reading for present,
@@ -56,8 +58,8 @@ void MyGraphicsPipeline::setupRenderPass(VkFormat swapChainImageFormat) {
 	dependency.srcAccessMask = 0;
 	// we don't need care the original access state but the target state
 
+	// During the subpass, keep writtable for the target image, prevent other transition
 	dependency.dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
-	// until writable color output stage, reading could finish.
 	dependency.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
 
 	VkRenderPassCreateInfo renderPassInfo{};
@@ -77,11 +79,13 @@ void MyGraphicsPipeline::setupRenderPass(VkFormat swapChainImageFormat) {
 MyGraphicsPipeline::MyGraphicsPipeline(VkDevice device,
 	VkExtent2D swapChainExtent, VkFormat swapChainImageFormat):device(device) {
 
+	// 0. Prepare the render pass settings, for gpu works on attached color image(FB) during one RenderPass.
 	this->setupRenderPass(swapChainImageFormat);
 
 	auto vertShaderCode = ShaderHelper::readFile("shaders/vert.spv");
 	auto fragShaderCode = ShaderHelper::readFile("shaders/frag.spv");
 
+	// 1. Vert and frag Shader Stage Create
 	VkShaderModule vertShaderModule = createShaderModule(device, vertShaderCode);
 	VkShaderModule fragShaderModule = createShaderModule(device, fragShaderCode);
 
@@ -100,6 +104,7 @@ MyGraphicsPipeline::MyGraphicsPipeline(VkDevice device,
 
 	VkPipelineShaderStageCreateInfo shaderStages[] = { vertShaderStageInfo, fragShaderStageInfo };
 
+	// 1.1 Describe Vertex shader Inputs, now... nothing.
 	VkPipelineVertexInputStateCreateInfo vertexInputInfo{};
 	vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
 	// Binding: spacing between data and whether data is per-vertex or per-instance
@@ -109,17 +114,24 @@ MyGraphicsPipeline::MyGraphicsPipeline(VkDevice device,
 	vertexInputInfo.vertexAttributeDescriptionCount = 0;
 	vertexInputInfo.pVertexAttributeDescriptions = nullptr;
 
+	// 2. Assemble vertex to primitive, attributes remarks.
 	VkPipelineInputAssemblyStateCreateInfo inputAssembly{};
 	inputAssembly.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
 	inputAssembly.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
 	inputAssembly.primitiveRestartEnable = VK_FALSE;
 
-	// dynamic state settings
+	// 3. dynamic state settings, only these 2 things can change
 	std::vector<VkDynamicState> dynamicStates = {
 		VK_DYNAMIC_STATE_VIEWPORT,
 		VK_DYNAMIC_STATE_SCISSOR,
 	};
 
+	VkPipelineDynamicStateCreateInfo dynamicState{};
+	dynamicState.sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO;
+	dynamicState.dynamicStateCount = static_cast<uint32_t>(dynamicStates.size());
+	dynamicState.pDynamicStates = dynamicStates.data();
+
+	// 4. Set Viewport for this pipeline
 	VkViewport viewport{};
 	viewport.x = 0.0f;
 	viewport.y = 0.0f;
@@ -131,11 +143,6 @@ MyGraphicsPipeline::MyGraphicsPipeline(VkDevice device,
 	scissor.offset = { 0, 0 };
 	scissor.extent = swapChainExtent;
 
-	VkPipelineDynamicStateCreateInfo dynamicState{};
-	dynamicState.sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO;
-	dynamicState.dynamicStateCount = static_cast<uint32_t>(dynamicStates.size());
-	dynamicState.pDynamicStates = dynamicStates.data();
-
 	VkPipelineViewportStateCreateInfo viewportState{};
 	viewportState.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
 	// multiple viewports and scissors can be used on some GFX card
@@ -144,6 +151,7 @@ MyGraphicsPipeline::MyGraphicsPipeline(VkDevice device,
 	viewportState.scissorCount = 1;
 	viewportState.pScissors = &scissor;
 
+	// 5. Rasterizer Stage settings
 	VkPipelineRasterizationStateCreateInfo rasterizer{};
 	rasterizer.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
 	rasterizer.depthClampEnable = VK_FALSE;			// A feature useful in special cases like shadow maps
@@ -157,6 +165,7 @@ MyGraphicsPipeline::MyGraphicsPipeline(VkDevice device,
 	rasterizer.depthBiasClamp = 0.0f;			// optional
 	rasterizer.depthBiasSlopeFactor = 0.0f;		// optional
 
+	// 5.1 sampler setting for image
 	VkPipelineMultisampleStateCreateInfo multisampling{};
 	multisampling.sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
 	multisampling.sampleShadingEnable = VK_FALSE;
@@ -169,6 +178,8 @@ MyGraphicsPipeline::MyGraphicsPipeline(VkDevice device,
 	// TODO: Depth and stencil testing
 
 	/**
+	* 6. blending sets
+	*
 	* 2 ways to do color blending:
 	* - Mix old and new to final color
 	* - combine value using bitwise operations
@@ -206,7 +217,7 @@ MyGraphicsPipeline::MyGraphicsPipeline(VkDevice device,
 	colorBlending.blendConstants[2] = 0.0f;
 	colorBlending.blendConstants[3] = 0.0f;
 
-	// Pipeline Layout: data(uniform buffer, etc) layout for pipeline
+	// 7. others: Pipeline Layout: data(uniform buffer, etc) memory layout for pipeline
 	VkPipelineLayoutCreateInfo pipelineLayoutInfo{};
 	pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
 	pipelineLayoutInfo.setLayoutCount = 0;
@@ -259,6 +270,7 @@ MyGraphicsPipeline::~MyGraphicsPipeline() {
 	vkDestroyRenderPass(device, renderPass, nullptr);
 }
 
+// A simple wrapper for vkCreateShaderModule
 VkShaderModule MyGraphicsPipeline::createShaderModule(VkDevice device, const std::vector<char>& code) {
 	VkShaderModuleCreateInfo createInfo{};
 	createInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;

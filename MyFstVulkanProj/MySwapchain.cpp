@@ -44,28 +44,28 @@ MySwapchain::MySwapchain(const MyWindow *window,
 	createInfo.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
 
 	uint32_t queueFamilyIndices[] = { gfxIdx, pstIdx };
-	if (gfxIdx != pstIdx) {
+	if (gfxIdx != pstIdx) {	// image should be shared between queues
 		// Images can be used across multiple queue families.
 		// No explicit transfer needed. Just easy.
 		createInfo.imageSharingMode = VK_SHARING_MODE_CONCURRENT;
 		createInfo.queueFamilyIndexCount = 2;
 		createInfo.pQueueFamilyIndices = queueFamilyIndices;
 	}
-	else {
+	else { // image do not needed to be shared between queues
 		// Image ownership is owned by one queue family, best performace.
 		// Ownership transfer needs explicit transfer.
 		createInfo.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE;
-		createInfo.queueFamilyIndexCount = 0;
+		createInfo.queueFamilyIndexCount = 0;	// do not share, just fulfill zero.
 		createInfo.pQueueFamilyIndices = nullptr;
 	}
 
 	// A certain transform to swapchain image can be set, eg: rotation, flip
 	createInfo.preTransform = swapchainSD->capabilities.currentTransform;
+
 	// Whether to blend this window with other window in Window System
 	createInfo.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
 	createInfo.presentMode = presentMode;
-	// We do not care pixels that are obscured by other window.
-	// Unless we care the output pixels from memory not only one screen,
+
 	// we shoould set to flase to ban clip.
 	createInfo.clipped = VK_TRUE;
 	// Swapchain may need recreate when window is resized or...
@@ -77,7 +77,7 @@ MySwapchain::MySwapchain(const MyWindow *window,
 		throw std::runtime_error("failed to create swap chain");
 	}
 
-	// Acquire swapchain images
+	// Acquire swapchain images from created Swapchain
 	vkGetSwapchainImagesKHR(device, swapchain, &imageCount, nullptr);
 	swapChainImages.resize(imageCount);
 	vkGetSwapchainImagesKHR(device, swapchain, &imageCount, swapChainImages.data());
@@ -120,6 +120,8 @@ MySwapchain::~MySwapchain() {
 }
 
 /**
+* Just pick one format for display.
+*
 * VkSurfaceFormatKHR contains a format and a colorSpace member.
 * VK_FORMAT_B8G8R8A8_SRGB => B8G8R8A8 represents format and bpp
 *							 SRGB represents color space

@@ -27,8 +27,8 @@ public:
 private:
 	void pickPhysicalDevice(VkSurfaceKHR surface);
 	bool isDeviceSuitable(VkPhysicalDevice device, VkSurfaceKHR surface);
-	bool checkDeviceExtensionSupport(VkPhysicalDevice device);
-	SwapChainSupportDetails querySwapChainSupport(VkPhysicalDevice device);
+	bool checkDeviceExtensionAndSwapchainSupport(VkPhysicalDevice device);
+	SwapChainSupportDetails querySwapChainSupport(VkPhysicalDevice device, VkSurfaceKHR platformSurface);
 
 	VkPhysicalDevice physicalDevice;
 	MyVKInstance *instance;
