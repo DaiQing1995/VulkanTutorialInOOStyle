@@ -7,20 +7,21 @@
 class MyCommandBuffer
 {
 public:
-	MyCommandBuffer(VkDevice device, uint32_t gfxQueueIdx, uint32_t pstQueueIdx);
+	MyCommandBuffer(VkDevice device, uint32_t gfxQueueIdx,
+		uint32_t pstQueueIdx, uint32_t cmdBufCount);
 	~MyCommandBuffer();
 
-	inline VkCommandBuffer* getCmdBufferPtr() { return &commandBuffer; }
+	inline VkCommandBuffer* getCmdBufferPtr(int idx) { return &commandBuffers[idx]; }
 
-	void recordCommandBuffer();
-	inline void clearBuffer() { vkResetCommandBuffer(commandBuffer, 0); }
-	void startRenderPass(VkRenderPass renderPass, VkFramebuffer framebuffer, VkExtent2D swapChainExtent);
-	void bindGFXPipeline(VkPipeline graphicsPipeline, VkExtent2D swapChainExtent);
-	void draw();
-	void endRenderPass(VkRenderPass renderPass);
+	void recordCommandBuffer(int idx);
+	inline void clearBuffer(int idx) { vkResetCommandBuffer(commandBuffers[idx], 0); }
+	void startRenderPass(VkRenderPass renderPass, VkFramebuffer framebuffer, VkExtent2D swapChainExtent, int idx);
+	void bindGFXPipeline(VkPipeline graphicsPipeline, VkExtent2D swapChainExtent, int idx);
+	void draw(int idx);
+	void endRenderPass(VkRenderPass renderPass, int idx);
 
 private:
-	VkCommandBuffer commandBuffer;
+	std::vector<VkCommandBuffer> commandBuffers;
 	VkCommandPool commandPool;	// command buffers are allocated from command pool
 	VkDevice device;
 };

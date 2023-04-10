@@ -2,7 +2,8 @@
 #include <stdexcept>
 
 MyCommandBuffer::MyCommandBuffer(VkDevice device,
-		uint32_t gfxQueueIdx, uint32_t pstQueueIdx):device(device) {
+		uint32_t gfxQueueIdx, uint32_t pstQueueIdx,
+		uint32_t cmdBufCount):device(device) {
 	VkCommandPoolCreateInfo poolInfo{};
 	poolInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
 	/**
@@ -39,9 +40,10 @@ MyCommandBuffer::MyCommandBuffer(VkDevice device,
 	* from primary command buffer.
 	*/
 	allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-	allocInfo.commandBufferCount = 1;
+	allocInfo.commandBufferCount = cmdBufCount;
 
-	if (vkAllocateCommandBuffers(device, &allocInfo, &commandBuffer) != VK_SUCCESS) {
+	commandBuffers.resize(cmdBufCount);
+	if (vkAllocateCommandBuffers(device, &allocInfo, commandBuffers.data()) != VK_SUCCESS) {
 		throw std::runtime_error("failed to allocate command buffers!");
 	}
 }
@@ -50,7 +52,7 @@ MyCommandBuffer::~MyCommandBuffer() {
 	vkDestroyCommandPool(device, commandPool, nullptr);
 }
 
-void MyCommandBuffer::recordCommandBuffer() {
+void MyCommandBuffer::recordCommandBuffer(int idx) {
 	VkCommandBufferBeginInfo beginInfo{};
 	beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
 	/**
@@ -67,7 +69,7 @@ void MyCommandBuffer::recordCommandBuffer() {
 
 	// If the command buffer was already recorded once, vkBeginCommandBuffer will
 	// implicitly reset it.
-	if (vkBeginCommandBuffer(commandBuffer, &beginInfo) != VK_SUCCESS) {
+	if (vkBeginCommandBuffer(commandBuffers[idx], &beginInfo) != VK_SUCCESS) {
 		throw std::runtime_error("Failed to begin recording command buffer!");
 	}
 }
@@ -76,7 +78,7 @@ void MyCommandBuffer::recordCommandBuffer() {
 * Specify the render pass used during this command buffer submit.
 * And and the VkFramebuffer for swapchain image description.
 */
-void MyCommandBuffer::startRenderPass(VkRenderPass renderPass, VkFramebuffer framebuffer, VkExtent2D swapChainExtent) {
+void MyCommandBuffer::startRenderPass(VkRenderPass renderPass, VkFramebuffer framebuffer, VkExtent2D swapChainExtent, int idx) {
 
 	VkRenderPassBeginInfo renderPassInfo{};
 	renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
@@ -97,13 +99,13 @@ void MyCommandBuffer::startRenderPass(VkRenderPass renderPass, VkFramebuffer fra
 	* VK_SUBPASS_CONTENTS_SECONDARY_COMMAND_BUFFERS: Render Pass command will be executed from
 	* secondary cmdbuf.
 	*/
-	vkCmdBeginRenderPass(commandBuffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
+	vkCmdBeginRenderPass(commandBuffers[idx], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
 }
 
 void MyCommandBuffer::bindGFXPipeline(VkPipeline gfxPipeline,
-		VkExtent2D swapChainExtent) {
+		VkExtent2D swapChainExtent, int idx) {
 
-	vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, gfxPipeline);
+	vkCmdBindPipeline(commandBuffers[idx], VK_PIPELINE_BIND_POINT_GRAPHICS, gfxPipeline);
 
 	// TODO: Pipeline dynamic settings, which is strong relates to pipeline sets, make
 	// it flexible in the future.
@@ -114,26 +116,26 @@ void MyCommandBuffer::bindGFXPipeline(VkPipeline gfxPipeline,
 	viewport.height = static_cast<float>(swapChainExtent.height);
 	viewport.minDepth = 0.0f;
 	viewport.maxDepth = 1.0f;
-	vkCmdSetViewport(commandBuffer, 0, 1, &viewport);
+	vkCmdSetViewport(commandBuffers[idx], 0, 1, &viewport);
 
 	VkRect2D scissor{};
 	scissor.offset = { 0, 0 };
 	scissor.extent = swapChainExtent;
-	vkCmdSetScissor(commandBuffer, 0, 1, &scissor);
+	vkCmdSetScissor(commandBuffers[idx], 0, 1, &scissor);
 }
 
-void MyCommandBuffer::draw() {
+void MyCommandBuffer::draw(int idx) {
 	// vertexCount, instanceCount, firstVertex, firstInstance
 	// vertex now is statically set in shader.
-	vkCmdDraw(commandBuffer, 3, 1, 0, 0);
+	vkCmdDraw(commandBuffers[idx], 3, 1, 0, 0);
 }
 
-void MyCommandBuffer::endRenderPass(VkRenderPass renderPass) {
+void MyCommandBuffer::endRenderPass(VkRenderPass renderPass, int idx) {
 	// End render pass
-	vkCmdEndRenderPass(commandBuffer);
+	vkCmdEndRenderPass(commandBuffers[idx]);
 
 	// Finish recording
-	if (vkEndCommandBuffer(commandBuffer) != VK_SUCCESS) {
+	if (vkEndCommandBuffer(commandBuffers[idx]) != VK_SUCCESS) {
 		throw std::runtime_error("failed to record command buffer!");
 	}
 }
