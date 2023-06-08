@@ -141,8 +141,6 @@ private:
 	void drawFrame() {
 		// 1. wait 1 signal for inFlightFence
 		vkWaitForFences(logDev->getDevice(), 1, &inFlightFences[currentFrame], VK_TRUE, UINT64_MAX);
-		// recor the signal
-		vkResetFences(logDev->getDevice(), 1, &inFlightFences[currentFrame]);
 
 		uint32_t imageIndex;
 		// 2. acquire image index
@@ -166,6 +164,9 @@ private:
 		else if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR) {
 			throw std::runtime_error("failed to acquire swap chain image!");
 		}
+
+		// recover the signal
+		vkResetFences(logDev->getDevice(), 1, &inFlightFences[currentFrame]);
 
 		// 3. record
 		cmdbuffer->clearBuffer(currentFrame);
