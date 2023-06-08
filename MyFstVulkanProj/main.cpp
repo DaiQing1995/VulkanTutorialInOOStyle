@@ -51,10 +51,10 @@ private:
 		ins->setupDebugMessenger();
 
 		// Create surface
-		surface = ins->createSurface();
+		ins->createSurface();
 
 		// Create phycical device
-		phyDev = new MyVKPhyDev(ins, surface);
+		phyDev = new MyVKPhyDev(ins, ins->getSurface());
 
 		// Create logical device
 		logDev = new MyLogicalDev(phyDev->getPhyDev(),
@@ -64,7 +64,7 @@ private:
 		// Create swapchain
 		swapChain = new MySwapchain(window,
 				phyDev->getSwapChainSupportDetails(),
-				surface, logDev->getDevice(),
+				ins->getSurface(), logDev->getDevice(),
 				phyDev->getGraphicsQueueFamilyIdx(),
 				phyDev->getPresentQueueFamilyIdx());
 
@@ -86,6 +86,22 @@ private:
 		createSyncObjects();
 
 		currentFrame = 0;
+	}
+
+	void recreateSwapChain() {
+		vkDeviceWaitIdle(logDev->getDevice());
+		delete framebuffers;
+		delete swapChain;
+		// Create swapchain (New size would be queried during creation)
+		swapChain = new MySwapchain(window,
+			phyDev->getSwapChainSupportDetails(),
+			ins->getSurface(), logDev->getDevice(),
+			phyDev->getGraphicsQueueFamilyIdx(),
+			phyDev->getPresentQueueFamilyIdx());
+		// Create framebuffer
+		framebuffers = new MyFramebuffer(swapChain, gfxPipeline);
+		// NOTE: here does not create pipeline, which has extent info
+		// difference between old one and new one.
 	}
 
 	// Drawing
@@ -132,8 +148,24 @@ private:
 		// 2. acquire image index
 		// after acquire, imageAvailable Semaphore signaled(Inside GPU, CPU continues), 
 		// imageIndex is the VkImage index inside swapchain's swapChainImages vector
-		vkAcquireNextImageKHR(logDev->getDevice(), swapChain->getSwapChain(), UINT64_MAX,
+		VkResult result = vkAcquireNextImageKHR(logDev->getDevice(), swapChain->getSwapChain(), UINT64_MAX,
 			imageAvailableSemaphores[currentFrame], VK_NULL_HANDLE, &imageIndex);
+
+		// FEAT: add recreate
+		/**
+		* VK_ERROR_OUT_OF_DATE_KHR: The swap chain has become incompatible with the
+		* 	surface and can no longer be used for rendering. Usually happens after
+		* 	a window resize.
+		* VK_SUBOPTIMAL_KHR: The swap chain can still be used to successfully present
+		*	to the surface, but the surface properties are no longer matched exactly.
+		*/
+		if (result == VK_ERROR_OUT_OF_DATE_KHR) {
+			recreateSwapChain();
+			return;
+		}
+		else if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR) {
+			throw std::runtime_error("failed to acquire swap chain image!");
+		}
 
 		// 3. record
 		cmdbuffer->clearBuffer(currentFrame);
@@ -186,7 +218,14 @@ private:
 		presentInfo.pSwapchains = swapchains;
 		presentInfo.pImageIndices = &imageIndex;
 		presentInfo.pResults = nullptr;	// used for every swapchain checking
-		vkQueuePresentKHR(logDev->getPresentQueue(), &presentInfo);
+		result = vkQueuePresentKHR(logDev->getPresentQueue(), &presentInfo);
+
+		if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR) {
+			recreateSwapChain();
+		}
+		else if (result != VK_SUCCESS) {
+			throw std::runtime_error("failed to present swap chain image");
+		}
 
 		currentFrame = (currentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
 	}
@@ -227,7 +266,6 @@ private:
 	MyVKInstance *ins;
 	MyVKPhyDev* phyDev;
 	MyLogicalDev* logDev;
-	VkSurfaceKHR surface;
 
 	MySwapchain* swapChain;
 	MyGraphicsPipeline* gfxPipeline;

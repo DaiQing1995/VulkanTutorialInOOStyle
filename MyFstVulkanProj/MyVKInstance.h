@@ -19,6 +19,10 @@ public:
 		return instance;
 	}
 
+	inline VkSurfaceKHR getSurface() {
+		return surface;
+	}
+
 	VkSurfaceKHR createSurface();
 
 	MyVKInstance(const MyWindow* window);
