@@ -22,12 +22,24 @@ public:
 		glfwPollEvents();
 	}
 
+	inline void wait_events() {
+		glfwPollEvents();
+	}
+
 	inline GLFWwindow* getGLFWWindow() const {
 		return m_window;
 	}
 
 	inline bool should_close() {
 		return glfwWindowShouldClose(m_window);
+	}
+
+	inline bool shouldFrameBufferResize() {
+		return framebufferdResized;
+	}
+
+	inline void setFrameBufferResize(bool shouldResize) {
+		framebufferdResized = shouldResize;
 	}
 	
 	void getRequiredExtensions(uint32_t& glfwExtensionCount, const char*** glfwExtensions) const;
@@ -37,6 +49,7 @@ private:
 	uint32_t m_height;
 	uint32_t m_width;
 	GLFWwindow* m_window;
+	bool framebufferdResized = false;
 };
 
 #endif // !MY_WINDOW_H

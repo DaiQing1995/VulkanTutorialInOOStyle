@@ -89,6 +89,14 @@ private:
 	}
 
 	void recreateSwapChain() {
+		// consider the minimization condition, w/h comes to 0
+		int width = 0, height = 0;
+		window->getFrameBufferSize(&width, &height);
+		while (width == 0 || height == 0) {
+			window->getFrameBufferSize(&width, &height);
+			window->wait_events();
+		}
+
 		vkDeviceWaitIdle(logDev->getDevice());
 		delete framebuffers;
 		delete swapChain;
@@ -221,7 +229,9 @@ private:
 		presentInfo.pResults = nullptr;	// used for every swapchain checking
 		result = vkQueuePresentKHR(logDev->getPresentQueue(), &presentInfo);
 
-		if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR) {
+		if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR
+				|| window->shouldFrameBufferResize()) {
+			window->setFrameBufferResize(false);
 			recreateSwapChain();
 		}
 		else if (result != VK_SUCCESS) {
@@ -274,6 +284,7 @@ private:
 
 	uint32_t currentFrame;
 	MyCommandBuffer* cmdbuffer;
+
 	std::vector<VkSemaphore> imageAvailableSemaphores;
 	std::vector<VkSemaphore> renderFinishedSemaphores;
 	std::vector<VkFence> inFlightFences;
