@@ -364,3 +364,6 @@ FodyWeavers.xsd
 
 # shader compiled results
 *.spv
+
+# class diagram
+*.cd
