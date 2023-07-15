@@ -171,7 +171,6 @@
     <ClCompile Include="MyVKPhyDev.cpp" />
     <ClCompile Include="MyWindow.cpp" />
     <ClCompile Include="TriangleResource.cpp" />
-    <ClCompile Include="TriangleResource.h" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BasicEntities.h" />
@@ -187,6 +186,7 @@
     <ClInclude Include="MyWindow.h" />
     <ClInclude Include="MyConfig.h" />
     <ClInclude Include="ShaderHelper.h" />
+    <ClInclude Include="TriangleResource.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ClassDiagram.cd" />

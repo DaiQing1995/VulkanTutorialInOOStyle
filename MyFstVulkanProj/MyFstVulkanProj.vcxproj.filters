@@ -46,9 +46,6 @@
     <ClCompile Include="MyCommandBuffer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="TriangleResource.h">
-      <Filter>Header Files</Filter>
-    </ClCompile>
     <ClCompile Include="MyBufferHelper.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -94,6 +91,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="MyBufferHelper.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TriangleResource.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
