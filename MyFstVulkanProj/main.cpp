@@ -8,7 +8,9 @@
 #include "MyGraphicsPipeline.h"
 #include "MyFramebuffer.h"
 #include "MyCommandBuffer.h"
+#include "MyBufferHelper.h"
 
+#include "TriangleResource.h"
 #include <iostream>
 
 const char* APP_NAME = "Hello Triangle";
@@ -86,6 +88,12 @@ private:
 		createSyncObjects();
 
 		currentFrame = 0;
+
+		// Create Buffer Helper
+		bufferHelper = new BufferHelper(logDev->getDevice(), phyDev->getPhyDev());
+
+		// TODO: REFACTOR needed. Create Triabgle App needed vertex buffer
+		TriangleResourceIf::createTriangleVertexBuffer(bufferHelper);
 	}
 
 	void recreateSwapChain() {
@@ -128,6 +136,7 @@ private:
 			vkDestroySemaphore(logDev->getDevice(), renderFinishedSemaphores[i], nullptr);
 			vkDestroyFence(logDev->getDevice(), inFlightFences[i], nullptr);
 		}
+		delete bufferHelper;
 		delete cmdbuffer;
 		delete framebuffers;
 		delete gfxPipeline;
@@ -184,7 +193,10 @@ private:
 			swapChain->getSwapChainExtent(), currentFrame);
 		cmdbuffer->bindGFXPipeline(gfxPipeline->getPipeline(),
 			swapChain->getSwapChainExtent(), currentFrame);
-		cmdbuffer->draw(currentFrame);
+		VkBuffer vertexBuffers[1] = { TriangleResourceIf::vertexBuffer };
+		VkDeviceSize offsets[1] = { 0 };
+		cmdbuffer->bindVertexBuffers(vertexBuffers, offsets, currentFrame);
+		cmdbuffer->draw(currentFrame, Triangle_Vertices.size());
 		cmdbuffer->endRenderPass(gfxPipeline->getRenderPass(), currentFrame);
 
 		// 4. submit
@@ -288,6 +300,8 @@ private:
 	std::vector<VkSemaphore> imageAvailableSemaphores;
 	std::vector<VkSemaphore> renderFinishedSemaphores;
 	std::vector<VkFence> inFlightFences;
+
+	BufferHelper *bufferHelper;
 };
 
 int main() {

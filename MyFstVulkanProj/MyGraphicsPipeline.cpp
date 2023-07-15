@@ -1,6 +1,10 @@
+#include <stdexcept>
+
 #include "MyGraphicsPipeline.h"
 #include "ShaderHelper.h"
-#include <stdexcept>
+
+// TODO: a specific data should not included here, try to reconstruct
+#include "TriangleResource.h"
 
 /**
 * Specify how many color and depth buffers are needed. 
@@ -104,15 +108,19 @@ MyGraphicsPipeline::MyGraphicsPipeline(VkDevice device,
 
 	VkPipelineShaderStageCreateInfo shaderStages[] = { vertShaderStageInfo, fragShaderStageInfo };
 
-	// 1.1 Describe Vertex shader Inputs, now... nothing.
+	// 1.1 Describe Vertex shader Inputs.
+	// TODO: Current IMPL is hard-coded to TRIANGLE, NEED RECONSTRUCTION.
+	std::array<VkVertexInputAttributeDescription, 2> attributeDescriptions = TriangleResourceIf::getAttributeDescriptions();
+	VkVertexInputBindingDescription bindingDescription = TriangleResourceIf::getBindingDescription();
+
 	VkPipelineVertexInputStateCreateInfo vertexInputInfo{};
 	vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
 	// Binding: spacing between data and whether data is per-vertex or per-instance
-	vertexInputInfo.vertexBindingDescriptionCount = 0;
-	vertexInputInfo.pVertexBindingDescriptions = nullptr;
+	vertexInputInfo.vertexBindingDescriptionCount = 1;
+	vertexInputInfo.pVertexBindingDescriptions = &bindingDescription;
 	// Attribute: type of attributes passed to the vertex shader, offset
-	vertexInputInfo.vertexAttributeDescriptionCount = 0;
-	vertexInputInfo.pVertexAttributeDescriptions = nullptr;
+	vertexInputInfo.vertexAttributeDescriptionCount = static_cast<uint32_t>(attributeDescriptions.size());
+	vertexInputInfo.pVertexAttributeDescriptions = attributeDescriptions.data();
 
 	// 2. Assemble vertex to primitive, attributes remarks.
 	VkPipelineInputAssemblyStateCreateInfo inputAssembly{};

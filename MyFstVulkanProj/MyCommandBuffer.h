@@ -14,10 +14,18 @@ public:
 	inline VkCommandBuffer* getCmdBufferPtr(int idx) { return &commandBuffers[idx]; }
 
 	void recordCommandBuffer(int idx);
+
 	inline void clearBuffer(int idx) { vkResetCommandBuffer(commandBuffers[idx], 0); }
+
 	void startRenderPass(VkRenderPass renderPass, VkFramebuffer framebuffer, VkExtent2D swapChainExtent, int idx);
+
 	void bindGFXPipeline(VkPipeline graphicsPipeline, VkExtent2D swapChainExtent, int idx);
-	void draw(int idx);
+
+	// TODO: size of buffers....HARD CODED now
+	void bindVertexBuffers(VkBuffer vertexBuffer[1], VkDeviceSize offsets[1], int cmdBufferIdx);
+
+	void draw(int idx, int vertexCount);
+
 	void endRenderPass(VkRenderPass renderPass, int idx);
 
 private:

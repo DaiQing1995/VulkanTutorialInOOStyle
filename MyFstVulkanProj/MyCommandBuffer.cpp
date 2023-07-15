@@ -102,6 +102,12 @@ void MyCommandBuffer::startRenderPass(VkRenderPass renderPass, VkFramebuffer fra
 	vkCmdBeginRenderPass(commandBuffers[idx], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
 }
 
+void MyCommandBuffer::bindVertexBuffers(VkBuffer vertexBuffer[1],
+					VkDeviceSize offsets[1], int cmdBufferIdx) {
+
+	vkCmdBindVertexBuffers(commandBuffers[cmdBufferIdx], 0, 1, vertexBuffer, offsets);
+}
+
 void MyCommandBuffer::bindGFXPipeline(VkPipeline gfxPipeline,
 		VkExtent2D swapChainExtent, int idx) {
 
@@ -124,10 +130,10 @@ void MyCommandBuffer::bindGFXPipeline(VkPipeline gfxPipeline,
 	vkCmdSetScissor(commandBuffers[idx], 0, 1, &scissor);
 }
 
-void MyCommandBuffer::draw(int idx) {
+void MyCommandBuffer::draw(int idx, int vertexCount) {
 	// vertexCount, instanceCount, firstVertex, firstInstance
 	// vertex now is statically set in shader.
-	vkCmdDraw(commandBuffers[idx], 3, 1, 0, 0);
+	vkCmdDraw(commandBuffers[idx], vertexCount, 1, 0, 0);
 }
 
 void MyCommandBuffer::endRenderPass(VkRenderPass renderPass, int idx) {
