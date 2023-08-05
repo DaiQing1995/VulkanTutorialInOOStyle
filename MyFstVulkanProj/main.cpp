@@ -208,7 +208,7 @@ private:
 		cmdbuffer->draw(currentFrame, app->getVertexDrawingSize());
 		cmdbuffer->endRenderPass(gfxPipeline->getRenderPass(), currentFrame);
 
-		// 4. submit
+		// 4. submit to render
 		VkSubmitInfo submitInfo{};
 		submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
 
@@ -226,9 +226,9 @@ private:
 		submitInfo.pCommandBuffers = cmdbuffer->getCmdBufferPtr(currentFrame);
 
 		// let it signal renderFinish semaphore after executed
-		VkSemaphore renderFinsied[] = { renderFinishedSemaphores[currentFrame] };
+		VkSemaphore renderFinished[] = { renderFinishedSemaphores[currentFrame] };
 		submitInfo.signalSemaphoreCount = 1;
-		submitInfo.pSignalSemaphores = renderFinsied;
+		submitInfo.pSignalSemaphores = renderFinished;
 
 		// Signal inFlightFence after execution, then CPU can reuse the command buffer.
 		if (vkQueueSubmit(logDev->getGFXQueue(), 1, &submitInfo, inFlightFences[currentFrame]) != VK_SUCCESS) {
@@ -241,7 +241,7 @@ private:
 
 		presentInfo.waitSemaphoreCount = 1;
 		// presents must wait finished
-		presentInfo.pWaitSemaphores = renderFinsied;
+		presentInfo.pWaitSemaphores = renderFinished;
 
 		VkSwapchainKHR swapchains[] = { swapChain->getSwapChain() };
 		presentInfo.swapchainCount = 1;
