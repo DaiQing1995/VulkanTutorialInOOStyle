@@ -1,10 +1,58 @@
 #include "TriangleResource.h"
 
-VkBuffer TriangleResourceIf::vertexBuffer = VK_NULL_HANDLE;
+struct Vertex {
+	glm::vec2 pos;
+	glm::vec3 color;
+};
 
-VkVertexInputBindingDescription TriangleResourceIf::getBindingDescription() {
+const std::vector<Vertex> Triangle_Vertices = {
+	{{0.0f, -0.5f}, {0.0f, 1.0f, 1.0f}},
+	{{0.5f, 0.5f}, {1.0f, 1.0f, 0.0f}},
+	{{-0.5f, 0.5f}, {1.0f, 0.0f, 1.0f}}
+};
 
-	VkVertexInputBindingDescription bindingDescription{};
+const char* APP_NAME = "Hello Triangle";
+
+void TriangleResourceIf::createVertexBuffer(BufferHelper* bufHelper)
+{
+	VkBufferCreateInfo bufferInfo{};
+	bufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
+	bufferInfo.size = sizeof(Triangle_Vertices[0]) * Triangle_Vertices.size();
+	bufferInfo.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT;
+	// Buffer could be owned by a specific queue family or
+	// being shared between multipile at the same time.
+	bufferInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+	bufHelper->createBufferWithMemory(bufferInfo, vertexBuffer);
+	bufHelper->copyCPUData2Memory(vertexBuffer, Triangle_Vertices.data(), bufferInfo.size);
+}
+
+void TriangleResourceIf::vertexInputSetting4Pipeline(VkPipelineVertexInputStateCreateInfo* info) {
+	info->vertexBindingDescriptionCount = 1;
+	info->pVertexBindingDescriptions = &bindingDescription;
+	info->vertexAttributeDescriptionCount = static_cast<uint32_t>(attributeDescriptions.size());
+	info->pVertexAttributeDescriptions = attributeDescriptions.data();
+}
+
+void TriangleResourceIf::getVertexBuffers(std::vector<VkBuffer> &containers) {
+	containers.push_back(vertexBuffer);
+}
+
+/**
+* Vertex Buffer Offsets needs to be align with Vertex Buffer Arrtibute
+* Format size. In this case, it is VK_FORMAT_R32G32B32_SFLOAT.
+*/
+void TriangleResourceIf::getVertexBuffersOffsets(std::vector<VkDeviceSize>& containers) {
+	containers.push_back(0);
+}
+
+unsigned int TriangleResourceIf::getVertexDrawingSize() {
+	return static_cast<unsigned int>(Triangle_Vertices.size());
+}
+
+TriangleResourceIf::TriangleResourceIf() {
+	vertexBuffer = VK_NULL_HANDLE;
+	// 1. Binding: spacing between data and whether data is per-vertex or per-instance
+	bindingDescription = {};
 	bindingDescription.binding = 0;
 	bindingDescription.stride = sizeof(Vertex);
 	/**
@@ -14,11 +62,9 @@ VkVertexInputBindingDescription TriangleResourceIf::getBindingDescription() {
 	* Instanced rendering is not being used.
 	*/
 	bindingDescription.inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
-	return  bindingDescription;
-}
 
-std::array<VkVertexInputAttributeDescription, 2> TriangleResourceIf::getAttributeDescriptions() {
-	std::array<VkVertexInputAttributeDescription, 2> attributeDescriptions{};
+	// 2. Attribute: type of attributes passed to the vertex shader, offset
+	attributeDescriptions = {};
 	// which binding the per-vertex data comes. The buffer is GPU created.
 	attributeDescriptions[0].binding = 0;
 	// reference the location directive of the input in vertex sbader.
@@ -33,18 +79,8 @@ std::array<VkVertexInputAttributeDescription, 2> TriangleResourceIf::getAttribut
 	attributeDescriptions[1].location = 1;
 	attributeDescriptions[1].format = VK_FORMAT_R32G32B32_SFLOAT;
 	attributeDescriptions[1].offset = offsetof(Vertex, color);
-	return attributeDescriptions;
 }
 
-void TriangleResourceIf::createTriangleVertexBuffer(BufferHelper* bufHelper)
-{
-	VkBufferCreateInfo bufferInfo{};
-	bufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
-	bufferInfo.size = sizeof(Triangle_Vertices[0]) * Triangle_Vertices.size();
-	bufferInfo.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT;
-	// Buffer could be owned by a specific queue family or 
-	// being shared between multipile at the same time.
-	bufferInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
-	bufHelper->createBufferWithMemory(bufferInfo, vertexBuffer);
-	bufHelper->copyCPUData2Memory(vertexBuffer, Triangle_Vertices.data(), bufferInfo.size);
+TriangleResourceIf::~TriangleResourceIf() {
+
 }

@@ -7,7 +7,6 @@
 #include <string>
 
 extern const bool enableValidationLayers;
-extern const char* APP_NAME;
 extern const std::vector<const char*> validationLayers;
 
 class MyVKInstance {
@@ -25,7 +24,7 @@ public:
 
 	VkSurfaceKHR createSurface();
 
-	MyVKInstance(const MyWindow* window);
+	MyVKInstance(const MyWindow* window, const char *appName);
 	~MyVKInstance();
 
 private:

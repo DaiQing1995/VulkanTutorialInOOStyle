@@ -10,10 +10,11 @@
 #include "MyCommandBuffer.h"
 #include "MyBufferHelper.h"
 
+#include "Application.h"
+
 #include "TriangleResource.h"
 #include <iostream>
 
-const char* APP_NAME = "Hello Triangle";
 const int MAX_FRAMES_IN_FLIGHT = 2;
 
 const std::vector<const char*> validationLayers = {
@@ -30,7 +31,7 @@ const bool enableValidationLayers = false;
 const bool enableValidationLayers = true;
 #endif // NDEBUG
 
-class HelloTriangleApplication {
+class ApplicationEntry {
 public:
 	void run() {
 		initWindow();
@@ -38,6 +39,8 @@ public:
 		mainLoop();
 		cleanup();
 	}
+
+	ApplicationEntry(Application* app) :app(app){}
 
 private:
 
@@ -49,7 +52,7 @@ private:
 	// Vulkan environment settings
 	void initVulkan() {
 		// Init Instance
-		ins = new MyVKInstance(window);
+		ins = new MyVKInstance(window, APP_NAME);
 		ins->setupDebugMessenger();
 
 		// Create surface
@@ -74,7 +77,8 @@ private:
 		gfxPipeline = new MyGraphicsPipeline(
 				logDev->getDevice(),
 				swapChain->getSwapChainExtent(),
-				swapChain->getSwapChainImageFmt());
+				swapChain->getSwapChainImageFmt(),
+				app);
 
 		// Create framebuffer
 		framebuffers = new MyFramebuffer(swapChain, gfxPipeline);
@@ -92,8 +96,8 @@ private:
 		// Create Buffer Helper
 		bufferHelper = new BufferHelper(logDev->getDevice(), phyDev->getPhyDev());
 
-		// TODO: REFACTOR needed. Create Triabgle App needed vertex buffer
-		TriangleResourceIf::createTriangleVertexBuffer(bufferHelper);
+		// Create App needed vertex buffer
+		app->createVertexBuffer(bufferHelper);
 	}
 
 	void recreateSwapChain() {
@@ -145,6 +149,7 @@ private:
 		delete phyDev;
 		delete ins;
 		delete window;
+		delete app;
 	}
 
 	/**
@@ -193,10 +198,14 @@ private:
 			swapChain->getSwapChainExtent(), currentFrame);
 		cmdbuffer->bindGFXPipeline(gfxPipeline->getPipeline(),
 			swapChain->getSwapChainExtent(), currentFrame);
-		VkBuffer vertexBuffers[1] = { TriangleResourceIf::vertexBuffer };
-		VkDeviceSize offsets[1] = { 0 };
-		cmdbuffer->bindVertexBuffers(vertexBuffers, offsets, currentFrame);
-		cmdbuffer->draw(currentFrame, Triangle_Vertices.size());
+
+		std::vector<VkBuffer> vertexBufferVec;
+		app->getVertexBuffers(vertexBufferVec);
+		std::vector<VkDeviceSize> vertexBufferOffsets;
+		app->getVertexBuffersOffsets(vertexBufferOffsets);
+		cmdbuffer->bindVertexBuffers(vertexBufferVec.data(), vertexBufferOffsets.data(), currentFrame);
+
+		cmdbuffer->draw(currentFrame, app->getVertexDrawingSize());
 		cmdbuffer->endRenderPass(gfxPipeline->getRenderPass(), currentFrame);
 
 		// 4. submit
@@ -285,6 +294,7 @@ private:
 		}
 	}
 
+	Application* app;
 	MyWindow *window;
 	MyVKInstance *ins;
 	MyVKPhyDev* phyDev;
@@ -305,7 +315,8 @@ private:
 };
 
 int main() {
-	HelloTriangleApplication app{};
+	TriangleResourceIf* triangle = new TriangleResourceIf;
+	ApplicationEntry app(triangle);
 
 	try
 	{

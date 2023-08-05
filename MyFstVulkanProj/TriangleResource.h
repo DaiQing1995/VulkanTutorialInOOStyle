@@ -6,33 +6,32 @@
 #include <vulkan/vulkan.hpp>
 #include <array>
 #include "MyBufferHelper.h"
+#include "Application.h"
 
-struct Vertex {
-	glm::vec2 pos;
-	glm::vec3 color;
-};
+extern const char* APP_NAME;
 
-const std::vector<Vertex> Triangle_Vertices = {
-	{{0.0f, -0.5f}, {0.0f, 1.0f, 1.0f}},
-	{{0.5f, 0.5f}, {1.0f, 1.0f, 0.0f}},
-	{{-0.5f, 0.5f}, {1.0f, 0.0f, 1.0f}}
-};
-
-class TriangleResourceIf
+class TriangleResourceIf : public Application
 {
 public:
-	static VkVertexInputBindingDescription getBindingDescription();
-
-	static std::array<VkVertexInputAttributeDescription, 2> getAttributeDescriptions();
 	/**
 	* Create Vertex Buffer binding GPU
 	*/
-	static void createTriangleVertexBuffer(BufferHelper* bufHelper);
+	void createVertexBuffer(BufferHelper* bufHelper);
 
-	static VkBuffer vertexBuffer;
+	/**
+	* Used as callback in pipeline creation
+	*/
+	void vertexInputSetting4Pipeline(VkPipelineVertexInputStateCreateInfo* info);
 
+	void getVertexBuffers(std::vector<VkBuffer> &containers);
+	void getVertexBuffersOffsets(std::vector<VkDeviceSize>& containers);
+	unsigned int getVertexDrawingSize();
+
+	TriangleResourceIf();
+	~TriangleResourceIf();
 private:
-	TriangleResourceIf() {}
-	~TriangleResourceIf() {}
+	VkVertexInputBindingDescription bindingDescription;
+	std::array<VkVertexInputAttributeDescription, 2> attributeDescriptions;
+	VkBuffer vertexBuffer;
 };
 #endif

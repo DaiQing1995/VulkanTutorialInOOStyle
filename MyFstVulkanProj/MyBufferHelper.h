@@ -1,7 +1,7 @@
 #ifndef MY_BUFFER_HELPER
 #define MY_BUFFER_HELPER
 
-#include <vulkan/vulkan.hpp>
+#include <vulkan/vulkan.h>
 #include <unordered_map>
 
 /**

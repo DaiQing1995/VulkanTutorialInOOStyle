@@ -3,9 +3,6 @@
 #include "MyGraphicsPipeline.h"
 #include "ShaderHelper.h"
 
-// TODO: a specific data should not included here, try to reconstruct
-#include "TriangleResource.h"
-
 /**
 * Specify how many color and depth buffers are needed. 
 * How many samples used for them.
@@ -81,7 +78,8 @@ void MyGraphicsPipeline::setupRenderPass(VkFormat swapChainImageFormat) {
 }
 
 MyGraphicsPipeline::MyGraphicsPipeline(VkDevice device,
-	VkExtent2D swapChainExtent, VkFormat swapChainImageFormat):device(device) {
+	VkExtent2D swapChainExtent, VkFormat swapChainImageFormat, Application* app):
+		device(device), app(app) {
 
 	// 0. Prepare the render pass settings, for gpu works on attached color image(FB) during one RenderPass.
 	this->setupRenderPass(swapChainImageFormat);
@@ -109,18 +107,9 @@ MyGraphicsPipeline::MyGraphicsPipeline(VkDevice device,
 	VkPipelineShaderStageCreateInfo shaderStages[] = { vertShaderStageInfo, fragShaderStageInfo };
 
 	// 1.1 Describe Vertex shader Inputs.
-	// TODO: Current IMPL is hard-coded to TRIANGLE, NEED RECONSTRUCTION.
-	std::array<VkVertexInputAttributeDescription, 2> attributeDescriptions = TriangleResourceIf::getAttributeDescriptions();
-	VkVertexInputBindingDescription bindingDescription = TriangleResourceIf::getBindingDescription();
-
 	VkPipelineVertexInputStateCreateInfo vertexInputInfo{};
 	vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
-	// Binding: spacing between data and whether data is per-vertex or per-instance
-	vertexInputInfo.vertexBindingDescriptionCount = 1;
-	vertexInputInfo.pVertexBindingDescriptions = &bindingDescription;
-	// Attribute: type of attributes passed to the vertex shader, offset
-	vertexInputInfo.vertexAttributeDescriptionCount = static_cast<uint32_t>(attributeDescriptions.size());
-	vertexInputInfo.pVertexAttributeDescriptions = attributeDescriptions.data();
+	app->vertexInputSetting4Pipeline(&vertexInputInfo);
 
 	// 2. Assemble vertex to primitive, attributes remarks.
 	VkPipelineInputAssemblyStateCreateInfo inputAssembly{};
