@@ -21,8 +21,7 @@ public:
 
 	void bindGFXPipeline(VkPipeline graphicsPipeline, VkExtent2D swapChainExtent, int idx);
 
-	// TODO: size of buffers....HARD CODED now
-	void bindVertexBuffers(VkBuffer vertexBuffer[1], VkDeviceSize offsets[1], int cmdBufferIdx);
+	void bindVertexBuffers(std::vector<VkBuffer> vertexBuffers, std::vector<VkDeviceSize> offsets, int cmdBufferIdx);
 
 	void draw(int idx, int vertexCount);
 

@@ -172,7 +172,7 @@ MyGraphicsPipeline::MyGraphicsPipeline(VkDevice device,
 	multisampling.alphaToCoverageEnable = VK_FALSE;	// optional
 	multisampling.alphaToOneEnable = VK_FALSE;		// optional
 	
-	// TODO: Depth and stencil testing
+	// TODO: Depth and stencil testing, Delay till needed.
 
 	/**
 	* 6. blending sets

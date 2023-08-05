@@ -1,6 +1,7 @@
 #include <stdexcept>
 #include <string>
 #include "MyBufferHelper.h"
+#include <stdexcept>
 
 /**
 * [Memory Heap] Memory needs to be allocated from different heap that GPU
@@ -45,7 +46,7 @@ void BufferHelper::copyCPUData2Memory(VkBuffer buffer, const void* src, size_t s
 		vkUnmapMemory(m_device, createdBufferMaps[buffer]);
 	}
 	else {
-		// TODO: Consider to create lazy memory creation
+		throw std::runtime_error("Buffer is used to save data while not created yet.");
 	}
 }
 

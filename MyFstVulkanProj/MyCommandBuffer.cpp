@@ -102,10 +102,10 @@ void MyCommandBuffer::startRenderPass(VkRenderPass renderPass, VkFramebuffer fra
 	vkCmdBeginRenderPass(commandBuffers[idx], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
 }
 
-void MyCommandBuffer::bindVertexBuffers(VkBuffer vertexBuffer[1],
-					VkDeviceSize offsets[1], int cmdBufferIdx) {
+void MyCommandBuffer::bindVertexBuffers(std::vector<VkBuffer> vertexBuffers,
+					std::vector<VkDeviceSize> offsets, int cmdBufferIdx) {
 
-	vkCmdBindVertexBuffers(commandBuffers[cmdBufferIdx], 0, 1, vertexBuffer, offsets);
+	vkCmdBindVertexBuffers(commandBuffers[cmdBufferIdx], 0, 1, vertexBuffers.data(), offsets.data());
 }
 
 void MyCommandBuffer::bindGFXPipeline(VkPipeline gfxPipeline,
@@ -114,7 +114,7 @@ void MyCommandBuffer::bindGFXPipeline(VkPipeline gfxPipeline,
 	vkCmdBindPipeline(commandBuffers[idx], VK_PIPELINE_BIND_POINT_GRAPHICS, gfxPipeline);
 
 	// TODO: Pipeline dynamic settings, which is strong relates to pipeline sets, make
-	// it flexible in the future.
+	// it flexible in the future. While for now, the usecase is not clear, delay this task.
 	VkViewport viewport{};
 	viewport.x = 0.0f;
 	viewport.y = 0.0f;

@@ -203,7 +203,7 @@ private:
 		app->getVertexBuffers(vertexBufferVec);
 		std::vector<VkDeviceSize> vertexBufferOffsets;
 		app->getVertexBuffersOffsets(vertexBufferOffsets);
-		cmdbuffer->bindVertexBuffers(vertexBufferVec.data(), vertexBufferOffsets.data(), currentFrame);
+		cmdbuffer->bindVertexBuffers(vertexBufferVec, vertexBufferOffsets, currentFrame);
 
 		cmdbuffer->draw(currentFrame, app->getVertexDrawingSize());
 		cmdbuffer->endRenderPass(gfxPipeline->getRenderPass(), currentFrame);
